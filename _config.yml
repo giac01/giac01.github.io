@@ -10,8 +10,8 @@
 locale                   : "en-US"
 title                    : "Giacomo Bignardi, PhD Psychology Researcher"
 title_separator          : "-"
-name                     : &name "Your Name"
-description              : &description "personal description"
+name                     : &name "Giacomo Bignardi"
+description              : &description "Developmental Science PostDoc"
 url                      : https://giac01.github.io # the base hostname & protocol for your site e.g. "https://mmistakes.github.io"
 baseurl                  : "" # the subpath of your site, e.g. "/blog"
 repository               : "giac01/giaco01.github.io"
@@ -21,7 +21,7 @@ repository               : "giac01/giaco01.github.io"
 #               Additional customization can be done by editing /_includes/author-profile.html
 author:
   # Biographic information
-  avatar           : "profile.png"
+  avatar           : "profile_pic.jpeg"
   name             : "Giacomo Bignardi"
   pronouns         : # example: "she/her"  
   bio              : "PhD Psychology Researcher"
@@ -41,8 +41,6 @@ author:
   # Social media
   bluesky          : "bignardi.bsky.social" # Replace this with you Bluesky username
   twitter          : "BignardiG"  # Replace this with your X / Twitter handle
-  youtube          : "UC2qxf7_IqR9t0VqpB1DzO2w"
-
 
 # Site Settings
 teaser                   :  # filename of teaser fallback teaser image placed in /images/, .e.g. "500x300.png"

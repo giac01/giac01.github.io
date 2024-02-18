@@ -9,14 +9,11 @@ redirect_from:
 
 
 Biography
+------
+Giacomo (pronounced jack-a-mo) is a postdoc at the University of Cambridge, based in the the [Developmental Cognitive Neuroscience Group](https://sites.google.com/site/blakemorelab/).
 
-Giacomo (pronounced jack-a-mo) is a postdoc at the University of Cambridge, based in the the [developmental cognitive neuroscience group](https://sites.google.com/site/blakemorelab/).
-
-Giacomo's research interests are broadly in child development, individual-differences and data-science.
-
-His PhD research has focused on the environmental mechanisms behind social inequalities in educational and mental health outcomes. 
- 
+I research the socioeconomic and environmental predictors of wellbeing in childhood & adolescence, using fancy quantitative methods and mostly using other people's data (secondary data). I am also interested in quantitative research methods, particularly multivariate and Bayesian statistical methods, and how they can be applied to improve how we measure psychological constructs. 
 
 For more info
 ------
-More info about configuring academicpages can be found in [the guide](https://academicpages.github.io/markdown/). The [guides for the Minimal Mistakes theme](https://mmistakes.github.io/minimal-mistakes/docs/configuration/) (which this theme was forked from) might also be helpful.
+Please see my [google scholar](https://scholar.google.co.uk/citations?hl=en&user=lbJACXwAAAAJ&view_op=list_works&sortby=pubdate) for my latest research. I am also semi-active on [bluesky](https://bsky.app/profile/bignardi.bsky.social).
