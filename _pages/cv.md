@@ -11,9 +11,12 @@ redirect_from:
 
 Previous Employment
 ======
-* 2022-2024: Postdoctoral Research Associate
+* 2023+ Postdoctoral By-Fellow
+  * [Churchill College, Cambridge](https://www.chu.cam.ac.uk/fellows/dr-giacomo-bignardi/)
+    
+* 2022+: Postdoctoral Research Associate
   * Department of Psychology, University of Cambridge
-  * [(Professor Sarah-Jayne Blakemore / Developmental Cognitive Neuroscience Lab)](https://sites.google.com/site/blakemorelab/)
+  * [Professor Sarah-Jayne Blakemore / Developmental Cognitive Neuroscience Lab](https://sites.google.com/site/blakemorelab/)
 
 * 2017-2021: PhD Studentship
   * Funded PhD Scholarship with [Professor Duncan Astle / 4D Lab](https://www.astlelab.com/)
