@@ -13,7 +13,9 @@ Biography
 ------
 Giacomo (pronounced jack-a-mo) is a postdoc at the University of Cambridge, based in the the [Developmental Cognitive Neuroscience Group](https://sites.google.com/site/blakemorelab/).
 
-I research the socioeconomic and environmental predictors of wellbeing in childhood & adolescence, using fancy quantitative methods and mostly using other people's data (secondary data). I am also interested in quantitative research methods, particularly multivariate and Bayesian statistical methods, and how they can be applied to improve how we measure psychological constructs. 
+I research the socioeconomic and environmental predictors of wellbeing in childhood & adolescence, using fancy quantitative methods and primarily other people's ("secondary") datasets. I am also interested in quantitative research methods, particularly multivariate and Bayesian statistical methods, and how they can be applied to improve how we measure psychological constructs. 
+
+This site is still in construction, sorry for the bugs! 
 
 For more info
 ------
