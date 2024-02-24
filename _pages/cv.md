@@ -9,7 +9,7 @@ redirect_from:
 
 {% include base_path %}
 
-Previous Employment
+Previous Positions
 ======
 * 2023+ Postdoctoral By-Fellow
   * [Churchill College, Cambridge](https://www.chu.cam.ac.uk/fellows/dr-giacomo-bignardi/)
@@ -31,3 +31,4 @@ Education
 * PhD, MRC Cognition and Brain Sciences Unit, University of Cambridge, 2021
 * MRes in Animal Behaviour, Newcastle University (UK), 2015
 * MA in Politics, Psychology & Sociology, University of Cambridge, 2014
+* Mathematical Statistics (M347 - 30 credit module), Open University, 2020.
