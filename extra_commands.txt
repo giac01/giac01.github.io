@@ -1,0 +1,3 @@
+FOR ICONS:
+
+quarto add mcanouil/quarto-iconify

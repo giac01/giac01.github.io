@@ -1,0 +1,32 @@
+---
+title: "Giacomo Bignardi, PhD"
+toc: false
+about:
+  id: hero-heading
+  template: solana
+  image: images/profile.png
+  links:
+    - text: "{{< iconify academicons:google-scholar >}} Google Scholar"
+      href: https://scholar.google.co.uk/citations?hl=en&user=lbJACXwAAAAJ&view_op=list_works&sortby=pubdate
+    - icon: ai bi-envelope
+      text: Mail
+      href: mailto:bignardig@outlook.com
+    - icon: github
+      text: Github
+      href: https://github.com/giac01/
+    - text: "{{< iconify simple-icons:bluesky >}} BlueSky"
+      href: https://bsky.app/profile/bignardi.bsky.social
+    - icon: twitter
+      text: twitter
+      href: https://x.com/BignardiG
+    - text: "{{< iconify academicons:orcid >}} orcid"
+      href: https://orcid.org/0000-0002-1153-0838
+---
+
+{{< iconify noto-v1:house >}} Cambridge, United Kingdom<br/> 
+{{< iconify material-symbols:work >}} Department of Psychology, University of Cambridge<br/> 
+{{< iconify mdi:university >}} [Postdoctoral By-Fellow](https://www.chu.cam.ac.uk/fellows/dr-giacomo-bignardi/), Churchill College, Cambridge
+
+Giacomo (pronounced jack-a-mo) is a postdoc at the University of Cambridge, based in the the [Developmental Cognitive Neuroscience Group](https://sites.google.com/site/blakemorelab).
+
+I research the socioeconomic and environmental predictors of wellbeing in childhood & adolescence, using advanced quantitative methods and large-scale secondary datasets. I am also interested in quantitative research methods, particularly multivariate and Bayesian statistical methods, and how they can be applied to improve how we measure psychological constructs.

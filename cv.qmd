@@ -1,0 +1,25 @@
+---
+title: "CV"
+toc: false
+---
+
+# Previous Employment
+
+-   2023+ Postdoctoral By-Fellow
+    -   [Churchill College, Cambridge](https://www.chu.cam.ac.uk/fellows/dr-giacomo-bignardi/)
+-   2022+: Postdoctoral Research Associate
+    -   Department of Psychology, University of Cambridge
+    -   [Professor Sarah-Jayne Blakemore / Developmental Cognitive Neuroscience Lab](https://sites.google.com/site/blakemorelab/)
+-   2017-2021: PhD Studentship
+    -   Funded PhD Scholarship with [Professor Duncan Astle / 4D Lab](https://www.astlelab.com/)
+    -   Research on developmental cognitive neuroscience
+-   2015-2017
+    -   Research Assistant, Institute of Public Health, University of Cambridge
+    -   [Professor Theresa Marteau / The Behaviour and Health Research Unit (BHRU)](https://www.bhru.iph.cam.ac.uk/)
+
+# Education
+
+-   PhD, MRC Cognition and Brain Sciences Unit, University of Cambridge, 2021
+-   MRes in Animal Behaviour, Newcastle University (UK), 2015
+-   MA in Politics, Psychology & Sociology, University of Cambridge, 2014
+-   Mathematical Statistics (M347 - 30 credit module), Open University, 2020.

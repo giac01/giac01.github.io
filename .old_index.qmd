@@ -1,0 +1,48 @@
+---
+title: "Finley Malloc"
+about:
+  template: jolla
+  image: images/profile.jpg
+  links:
+    - icon: twitter
+      text: twitter
+      href: https://twitter.com
+    - icon: github
+      text: Github
+      href: https://github.com
+---
+
+This is a Quarto website. 
+
+{{< ai ai-google-scholar>}}
+
+<i class="ai ai-google-scholar-square ai-3x"></i>
+
+To learn more about Quarto websites visit <https://quarto.org/docs/websites>.
+
+{{< pagebreak >}}
+
+::: {.column-page-inset .text-center}
+```{=html}
+<a class="btn btn-outline-dark", href="https://x.com/BignardiG" target="_blank" rel="noopener noreferrer">
+    <i class="bi bi-twitter" role='img' aria-label='Twitter'></i>
+</a>
+
+<a class="btn btn-outline-dark", href="https://github.com/giac01/" target="_blank" rel="noopener noreferrer">
+    <i class="bi bi-github" role='img' aria-label='Github'></i>
+</a>
+
+<a class="btn btn-outline-dark", href="https://scholar.google.co.uk/citations?hl=en&user=lbJACXwAAAAJ&view_op=list_works&sortby=pubdate" target="_blank" rel="noopener noreferrer">
+    <i class="ai ai-google-scholar" role='img' aria-label='Google Scholar'></i>
+</a>
+
+<a class="btn btn-outline-dark", href="mailto:bignardig@outlook.com" target="_blank" rel="noopener noreferrer">
+    <i class="ai bi-envelope" role='img' aria-label='email'></i>
+</a>
+
+<a class="btn btn-outline-dark", href="https://orcid.org/0000-0002-1153-0838" target="_blank" rel="noopener noreferrer">
+    <i class="ai ai-orcid" role='img' aria-label='email'></i>
+</a>
+
+```
+::: 

@@ -1,0 +1,40 @@
+---
+title: "Pretty ggplot2 correlation matrices"
+description: "Example code for creating custom ggplot2 correlation matrices"
+author: "Giacomo Bignardi"
+date: "5/22/2021"
+draft: true
+---
+
+# Making nice correlation plots in ggplot2
+
+A correlation matrix is the backbone of a lot of statistical methods. Therefore, having nice ways to present correlation matrices in papers is quite handy.
+
+Even though there are a few great R packages for creating correlation matrix plots, creating them directly in ggplot2 allows a lot more flexibility.
+
+A nice property of Pearson's correlation coefficient is that you all only need two pieces of informatjion
+
+```{r}
+
+data(mtcars)
+
+head(mtcars)
+
+df = mtcars
+
+cor(mtcars)
+```
+
+##  Standard approach
+
+```{r}
+corrplot::corrplot(cor(df), addCoef.col = 'black')
+
+```
+
+## Ggplot
+
+```{r}
+
+gbtoolbox::plot_correlations(df)
+```
