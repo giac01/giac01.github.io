@@ -8,9 +8,8 @@
 
 <meta name="author" content="Giacomo Bignardi">
 <meta name="dcterms.date" content="2099-06-16">
-<meta name="description" content="Short description">
 
-<title>Giacomo Bignardi, PhD - Tutorial: Calculating relative measurement precision internal consistency reliability for for a go/nogo task</title>
+<title>Giacomo Bignardi, PhD - Tutorial: Calculating relative measurement precision (RMP) for a go/nogo task</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -177,13 +176,8 @@ window.Quarto = {
 <header id="title-block-header" class="quarto-title-block default page-columns page-full">
   <div class="quarto-title-banner page-columns page-full">
     <div class="quarto-title column-body">
-      <h1 class="title">Tutorial: Calculating relative measurement precision internal consistency reliability for for a go/nogo task</h1>
-                  <div>
-        <div class="description">
-          Short description
-        </div>
-      </div>
-                          <div class="quarto-categories">
+      <h1 class="title">Tutorial: Calculating relative measurement precision (RMP) for a go/nogo task</h1>
+                                <div class="quarto-categories">
                 <div class="quarto-category">reliability</div>
                 <div class="quarto-category">cognition</div>
               </div>
@@ -210,7 +204,7 @@ window.Quarto = {
       <div>
       <div class="quarto-title-meta-heading">Modified</div>
       <div class="quarto-title-meta-contents">
-        <p class="date-modified">May 23, 2021</p>
+        <p class="date-modified">May 23, 3999</p>
       </div>
     </div>
       
@@ -237,10 +231,8 @@ window.Quarto = {
   </ul></li>
   <li><a href="#calculate-relative-measurement-precision" id="toc-calculate-relative-measurement-precision" class="nav-link" data-scroll-target="#calculate-relative-measurement-precision">Calculate Relative Measurement Precision</a></li>
   <li><a href="#plot-relative-measurement-precision-estimates" id="toc-plot-relative-measurement-precision-estimates" class="nav-link" data-scroll-target="#plot-relative-measurement-precision-estimates">Plot relative measurement precision estimates</a></li>
-  <li><a href="#coda---do-our-bayeian-regression-estimates-of-d-give-us-more-reliable-measures-than-a-standard-approach" id="toc-coda---do-our-bayeian-regression-estimates-of-d-give-us-more-reliable-measures-than-a-standard-approach" class="nav-link" data-scroll-target="#coda---do-our-bayeian-regression-estimates-of-d-give-us-more-reliable-measures-than-a-standard-approach">Coda - do our Bayeian regression estimates of <code>d'</code> give us more reliable measures than a standard approach?</a>
-  <ul class="collapse">
+  <li><a href="#coda---are-bayesian-regression-estimates-of-d-more-reliable-measures-than-standard-estimates" id="toc-coda---are-bayesian-regression-estimates-of-d-more-reliable-measures-than-standard-estimates" class="nav-link" data-scroll-target="#coda---are-bayesian-regression-estimates-of-d-more-reliable-measures-than-standard-estimates">Coda - are Bayesian regression estimates of <code>d'</code> more reliable measures than standard estimates?</a></li>
   <li><a href="#split-half-approach" id="toc-split-half-approach" class="nav-link" data-scroll-target="#split-half-approach">Split-half approach</a></li>
-  </ul></li>
   </ul>
 </nav>
     </div>
@@ -1416,10 +1408,10 @@ Total execution time: 6.1 seconds.</code></pre>
 </div>
 </div>
 </section>
-<section id="coda---do-our-bayeian-regression-estimates-of-d-give-us-more-reliable-measures-than-a-standard-approach" class="level1">
-<h1>Coda - do our Bayeian regression estimates of <code>d'</code> give us more reliable measures than a standard approach?</h1>
-<p>If we just calculate <code>d'</code> using the tranformed hit rate and false alarm rate, using the formula above, does this give us estimates that are very different, or less reliable?</p>
-<p>The answer to the first question appears to be no, the estimates are very similar:</p>
+<section id="coda---are-bayesian-regression-estimates-of-d-more-reliable-measures-than-standard-estimates" class="level1">
+<h1>Coda - are Bayesian regression estimates of <code>d'</code> more reliable measures than standard estimates?</h1>
+<p>If we just calculate <code>d'</code> using the transformed hit rate and false alarm rate, using the formula above, does this give us estimates that are very different, or less reliable?</p>
+<p>The answer appears to be no, the estimates are very similar regardless of which approach we take:</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb37"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a>two_stage_estimate <span class="ot">=</span> </span>
 <span id="cb37-2"><a href="#cb37-2" aria-hidden="true" tabindex="-1"></a> data_long_summarised <span class="sc">%&gt;%</span></span>
@@ -1504,9 +1496,12 @@ Total execution time: 6.1 seconds.</code></pre>
 </div>
 <p>Because the point-estimates are so similar, the test-retest reliability should be pretty similar too.</p>
 <p>This just highlights that there isn’t anything magical about Bayesian or more fancy statistical methods. They don’t by default provide better estimates.</p>
-<p>This doesn’t mean that regression approach to calculating d’ is pointless. As we have shown, we can easily calculate internal consistency reliability from our Bayesian regression model. We could also calculate a credible interval for any participant’s true d’ score. We can also handle more complex designs within a regression approach, or we could control for time of day or practice effects, and much more.</p>
-<section id="split-half-approach" class="level2">
-<h2 class="anchored" data-anchor-id="split-half-approach">Split-half approach</h2>
+<p>This doesn’t mean that regression approach to calculating d’ is pointless. As we have shown, we can easily calculate internal consistency reliability from our Bayesian regression model. We could also calculate a credible interval for any participant’s true d’ score. We can also handle more complex signal detection theory models within a regression approach, or we could control for time of day or practice effects, and much more.</p>
+</section>
+<section id="split-half-approach" class="level1">
+<h1>Split-half approach</h1>
+<p>Finally, I checked how similar RMP estimates are to the standard split-half reliability estimates.</p>
+<p>To calculate split-half reliability, I created two datasets with odd and even trials respectively. I then calculated d’ using the transformed hit and false alarm rates, and calculated the correlation between split-half estimates at each time point. These correlations are then transformed using the <a href="#0">Spearman-Brown “prophecy” formula</a>.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb40"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb40-1"><a href="#cb40-1" aria-hidden="true" tabindex="-1"></a>data_long_odd <span class="ot">=</span> data_long <span class="sc">%&gt;%</span></span>
 <span id="cb40-2"><a href="#cb40-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(trial <span class="sc">%%</span> <span class="dv">2</span> <span class="sc">==</span> <span class="dv">1</span>) <span class="sc">%&gt;%</span></span>
@@ -1626,7 +1621,6 @@ data_long_even.d_prime_t1 107  0.97  0.97  0.92   0.89  3.3 0.73</code></pre>
 </div>
 
 
-</section>
 </section>
 
 </main> <!-- /main -->
