@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 <meta name="author" content="Giacomo Bignardi">
-<meta name="dcterms.date" content="2024-06-17">
+<meta name="dcterms.date" content="2024-06-16">
 <meta name="description" content="And why controlling for things is harder than you might think.">
 
 <title>Giacomo Bignardi, PhD - Issues with controlling for ‘IQ’</title>
@@ -174,7 +174,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
       <div>
       <div class="quarto-title-meta-heading">Published</div>
       <div class="quarto-title-meta-contents">
-        <p class="date">June 17, 2024</p>
+        <p class="date">June 16, 2024</p>
       </div>
     </div>
     
@@ -192,7 +192,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <ul>
   <li><a href="#residual-confounding" id="toc-residual-confounding" class="nav-link active" data-scroll-target="#residual-confounding">Residual Confounding</a>
   <ul class="collapse">
-  <li><a href="#does-increasing-the-reliability-of-our-covariate-help" id="toc-does-increasing-the-reliability-of-our-covariate-help" class="nav-link" data-scroll-target="#does-increasing-the-reliability-of-our-covariate-help">Does increasing the reliability of our covariate help?</a></li>
+  <li><a href="#does-increasing-reliability-of-our-covariate-help" id="toc-does-increasing-reliability-of-our-covariate-help" class="nav-link" data-scroll-target="#does-increasing-reliability-of-our-covariate-help">Does increasing reliability of our covariate help?</a></li>
   </ul></li>
   <li><a href="#solutions" id="toc-solutions" class="nav-link" data-scroll-target="#solutions">Solutions</a></li>
   <li><a href="#final-note" id="toc-final-note" class="nav-link" data-scroll-target="#final-note">Final note</a></li>
@@ -208,14 +208,14 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 
 <p>Many developmental science studies have the following setup.</p>
-<p>We start with a cognitive skill that we think is important for a particular outcome. Let’s use the example of <a href="https://en.wikipedia.org/wiki/Approximate_number_system">“number sense”</a> measured using a non-symbolic number discrimination task. We hypothesise that this cognitive skill is particularly important for influencing a specific outcome, let’s say mathematical ability.</p>
+<p>We start with some cognitive skill that we think is important for learning. For example, lets say its one’s <a href="https://en.wikipedia.org/wiki/Approximate_number_system">“number sense”</a> measured using a non-symbolic number discrimination task. We hypothesise that this cognitive skill is particularly important for predicting a specific outcome, let’s say mathematical ability.</p>
 <p>A problem with cognitive variables is that individuals who do well on one test of cognitive or academic performance, generally do well on others. This phenomenon has been termed the <a href="https://en.wikipedia.org/wiki/G_factor_(psychometrics)">positive manifold</a>.</p>
 <p>One explanation for the positive manifold is that individual’s have some general cognitive ability (or “general intelligence”) that causes performance on all other cognitive skills.</p>
-<p>So, going back to our example study, a standard way of testing whether our cognition of interest (number sense) is important for our outcome of interest (mathematics) is to run a multivariable regression analysis with number sense and “IQ” as predictors, and mathematics ability as the outcome variable. Usually, “IQ” is measured using a nonverbal reasoning assessment.</p>
+<p>So, going back to our example study, a standard way of testing whether our cognition of interest (number sense) is important for our outcome of interest (mathematics) is to run a multivariable regression analysis with number sense and “IQ” as predictors, and mathematics ability as the outcome variable. Usually, “IQ” is measured using a non-verbal reasoning assessment.</p>
 <p>What could possibly go wrong? Let’s explore this using a causal diagram.</p>
 <section id="residual-confounding" class="level2">
 <h2 class="anchored" data-anchor-id="residual-confounding">Residual Confounding</h2>
-<p>Let’s hypothesise that general cognitive ability causes one to have better number sense, nonverbal reasoning and mathematics skills and that neither number sense nor nonverbal reasoning have causal effects on mathematics. Let’s assume multiple other factors independently cause number sense, nonverbal reasoning, and mathematics skills. Because these other causes are not in our model, we can represent them as random “error” terms.</p>
+<p>Let hypothesise that general cognitive ability causes one to have better number sense, non-verbal reasoning and mathematics skills, and that neither number sense or non-verbal reasoning have causal effects of mathematics. Let’s assume there multiple other factors that independently cause number sense, non-verbal reasoning, and mathematics skills. Because these other causes are not in our model, we can represent them as random “error” terms.</p>
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
@@ -252,11 +252,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </div>
 </div>
-<p>In this example, general cognitive ability (GCA) is a common cause of number sense (NS) and mathematics (Math). We will simulate data when neither number sense nor nonverbal reasoning have direct causal effects on mathematics. Therefore, if our analyses are appropriate, we should conclude that number sense has no specific causal effect on mathematics.</p>
-<p>In the real world, we rely on proxy measures such as nonverbal reasoning because we cannot measure general cognitive ability directly. However nonverbal reasoning is an imperfect measure of general cognitive ability because it has other causes (which we have termed “Err_NVR”), such as perhaps previous experience with abstract reasoning assessments, mood at the time of testing, background noise, etc.</p>
-<p>As we will see, if we try to control for a covariate (e.g., general cognitive ability) using a proxy measure that imperfectly measures the covariate (e.g., nonverbal reasoning performance), we will not fully adjust for confounding. This artefact is called <strong>residual confounding</strong>.</p>
-<p>We can simulate what happens in R when we use multivariable regression to test for an association between number sense and mathematics under two conditions. In the first condition, we control for general cognitive ability, and in the second condition we control for nonverbal reasoning.</p>
-<p>To simulate this model in R, we start with exogenous variables (variables that do not have a cause in the model) and work towards our endogenous variables caused by our previously simulated variables:</p>
+<p>In this example, general cognitive ability (GCA) acts as a common cause of number sense (NS) and non-verbal reasoning (NVR). Neither number sense or non-verbal reasoning have direct causal effects on mathematics.</p>
+<p>Because we cannot measure general cognitive ability directly, we can only control for non-verbal reasoning. However, because non-verbal reaosning is not a perfect measure of general cognitive ability, it will not perfectly adjust for confounding! Non-verbal reasoning isn’t a perfect measure of general cognitive ability because there are other variables outside of our model that independently cause non-verbal reasoning, which we have termed “Err_NVR” above.</p>
+<p>We can simulate what happens in R when we use multivariable regression to test for an association between number sense and mathematics under two conditions. In the first condition, we will also include general cognitive ability as a covariate, and in the second condition we will use non-verbal reasoning as a proxy measure of general cognitive ability.</p>
+<p>To simulate this model in our we have to start with exogenous variables (variables that do not have a cause in the model) and work towards our endogenous variables caused by our previously simulated variables:</p>
 <p><strong>Model Simulation Code</strong></p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">10</span>)</span>
@@ -324,21 +323,20 @@ Multiple R-squared:  0.3329,    Adjusted R-squared:  0.3329
 F-statistic: 2.495e+04 on 2 and 99997 DF,  p-value: &lt; 2.2e-16</code></pre>
 </div>
 </div>
-<p>In model0 with general cognitive ability as a covariate, the effect of general cognitive ability on math is close to 0 (beta ≈ .0). However when we control for nonverbal reasoning instead of GCA, there is a highly significant effect of number sense on math (beta ≈ .33).</p>
-<p>In the real world we cannot control for general cognitive ability directly, we can only use proxy measures like nonverbal reasoning. However, because nonverbal reasoning is an imperfect measure of general cognitive ability, it doesn’t fully adjust for confounding! Residual confounding even occurs when we have measured all the relevant confounding variables, but our measurements have some measurement error.</p>
-<p>In this example, the reliability of nonverbal reasoning was relatively poor. We can measure its reliability by calculating the squared correlation with general cognitive ability. In this case the reliability is 50%.</p>
-<p><strong>Reliability of nonverbal reasoning for measuring GCA</strong>:</p>
+<p>In model0 with general cognitive ability as a covariate, the effect of general cognitive ability on math is close to 0 (beta ≈ .0). However when we control for non-verbal reasoning instead of GCA, the effect only decreases slightly (beta ≈ .33).</p>
+<p>Because in practice (outside of simulations) we cannot control for general cognitive ability directly, we can only use proxy measures like non-verbal reasoning. However, because non-verbal reasoning is an imperfect measure of general cognitive ability, it doesn’t fully adjust for confounding!</p>
+<p>In this example, the reliability of non-verbal reasoning was relatively poor. We can measure its reliability by calculating the squared correlation with general cognitive ability. In this case the reliability is 50%.</p>
+<p><strong>Reliability of non-verbal reasoning for measuring GCA</strong>:</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cor</span>(gca, nvr)<span class="sc">^</span><span class="dv">2</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] 0.4986983</code></pre>
 </div>
 </div>
-<section id="does-increasing-the-reliability-of-our-covariate-help" class="level3">
-<h3 class="anchored" data-anchor-id="does-increasing-the-reliability-of-our-covariate-help">Does increasing the reliability of our covariate help?</h3>
-<p>If we increase the reliability of our covariate (NVR), this will reduce the amount of residual confounding. However, even if reliability is excellent, if it is less than 100% reliable (100% reliability = no measurement error), we will still see some residual confounding.</p>
-<p>Let’s rerun the simulation and, increase the reliability of NVR to 90% and see what happens.</p>
-<p>We can increase the reliability of nonverbal reasoning by reducing the variance of the error_nvr term. We can do this by setting <code>nvr = gca  + 1/3*err_nvr</code>.</p>
+<section id="does-increasing-reliability-of-our-covariate-help" class="level3">
+<h3 class="anchored" data-anchor-id="does-increasing-reliability-of-our-covariate-help">Does increasing reliability of our covariate help?</h3>
+<p>If we increase the reliability of our covariate (NVR) this will reduce the amount of residual confounding. However, even if reliability is really good, if it is less than 100% reliable (i.e.&nbsp;no measurement error) then we will still see some residual confounding.</p>
+<p>Let’s rerun the simulation and increase the reliability of NVR to 90% and see what happens.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">10</span>)</span>
 <span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a></span>
@@ -385,31 +383,31 @@ Multiple R-squared:  0.4538,    Adjusted R-squared:  0.4538
 F-statistic: 4.153e+04 on 2 and 99997 DF,  p-value: &lt; 2.2e-16</code></pre>
 </div>
 </div>
-<p>In this case, we still observe some residual confounding even when we have an excellent measure of general cognitive ability. Number sense is still a highly significant predictor of math skills, but its effect is much smaller now (Beta ≈ .09)</p>
+<p>In thie case, even when we have a really good measure of general cognitive ability - we still observe some residual confounding. Number sense still appears as a “significant” predictor of math skills, although its effect is much smaller now (Beta ≈ .9)</p>
 </section>
 </section>
 <section id="solutions" class="level1">
 <h1>Solutions</h1>
-<p>As always, outlining the problem is easier than fixing it.</p>
-<p><strong>Better covariates</strong>. Increasing the reliability of our covariate (nonverbal reasoning) reduced the beta coefficient for number sense. Perfect reliability is rarely posisble. Certainly, if we want a better observed measure of general cognitive ability could we should use more than one measure of cognitive or academic skills.</p>
-<p><strong>Focus on effect sizes rather than p-values</strong>. Even if we do a good job with covariate adjustment, a little residual confounding may sneak in, and thus, a small relationship between our predictor and outcome may persist. With large datasets, even tiny effect sizes may be statistically significant.</p>
-<p>A more convincing argument could be made if, instead of focusing on if number sense is a statistically significant predictor, we focus on how strongly it predicts math skills. A better case could be made for its importance if it is a strong predictor of math before and after adjusting for a set of reliable and <a href="https://journals.sagepub.com/doi/10.1177/25152459221095823">well-justified</a> covariates. In our example below, the effect is pretty small after adjusting for our more reliable measure of gca.</p>
-<p><strong>Better models</strong>. We cannot assume that controlling for a single measure of general cognitive ability, such as nonverbal reasoning, will tell us anything about the specificity of cognition-outcome relationships. A fundamental problem with this approach is that research has consistently shown that while tests of nonverbal reasoning are good measures of general cognitive ability - they are not particularly special among cognitive measures. <a href="https://onlinelibrary.wiley.com/doi/full/10.1111/desc.13451">We found</a>, for example, that vocabulary, reading and short-term memory tests can have even stronger relationships with general cognitive skills. Importantly, pretty much any cognitive or academic test can be considered a measure of general cognitive ability.</p>
-<p><a href="https://onlinelibrary.wiley.com/doi/full/10.1111/desc.13451">An alternative approach</a> would be to use a latent variable modelling approach and model general cognitive ability as a latent variable that causes performance on all cognitive variables, and then test if there are residual associations between cognitive tests and outcomes. There are also fancier ways of modelling cognitive data that do not assume a single latent variable, arguably an over-simplification.</p>
-<p><strong>Experiments!</strong> Confounding is challenging to eliminate via covariate adjustment. Another approach would be manipulating number sense experimentally, such as via a randomised training study where half the participants train their number sense skills, and the other half do not. Because group assignment (i.e., group = 0 for control, group 1 = for training group) is randomised, no confounding can occur because GCA or other variables cannot cause group assignment. <a href="https://jnc.psychopen.eu/index.php/jnc/article/view/5915">One study</a> did just this and did not find that number sense training improves symbolic math skills.</p>
+<p>As ever, outlining the problem is easier than fixing it.</p>
+<p><strong>Better covariates</strong>. Increasing the reliability of our covariate (non-verbal reasoning) reduced the beta coefficient for number sense. However, in practice, it is hard to have perfectly reliable variables. In this example a general cognitive ability could be sought by using many different measures of cognitive and academic skills.</p>
+<p><strong>Focus on effect sizes rather than p-values</strong>. Even if we do a really good job with covariate adjustment, a litte residual confounding may sneak in, and thus a small relationship between our predictor and outcome might persist. With large datasets, even very small effect sizes may be statistically significant.</p>
+<p>A more convincing argument could be made if instead on focusing on if number sense is a statistically significant predictor, we focus on how strongly it predicts math skills. If it is a strong predictor of math before and after adjusting for a set of covariates, a stronger case could be made for its importance. In our example below, the effect is pretty small after adjusting for our more reliable measure of gca.</p>
+<p><strong>Better models</strong>. In developmental science, we seem to assume that general cognitive ability (or “intelligence”) can simply be “controlled” for using non-verbal reasoning tests. This idea is flawed because research has consistently shown that while tests of non-verbal reasoning are good measures of general cognitive ability - it is not particularly special. <a href="https://onlinelibrary.wiley.com/doi/full/10.1111/desc.13451">We found</a> for example that vocabulary, reading and short-term memory tests can have even stronger relationships with general cognitive skills. Importantly, pretty much any cognitive or academic test can be considered a measure of general cognitve ability.</p>
+<p><a href="https://onlinelibrary.wiley.com/doi/full/10.1111/desc.13451">An alternative approach</a> would be to use a latent variable modelling approach and model general cognitive ability as a latent variable that causes performance on all cognitive variables, and then test if there are residual associations between cognitive tests and outcomes.</p>
+<p><strong>Experiments!</strong> Confounding is difficult to eliminate in observational studies. Another approach would be to manipulate number sense experimentally, such as via a randomised training study where half the participants train their number sense skills, and the other half do not. Because group assignment (i.e., group = 0 for control, group 1 = for training group) is randomised, no confounding can occur because GCA or other variables cannot cause group assignment. <a href="https://jnc.psychopen.eu/index.php/jnc/article/view/5915">One study did not find that number sense training improves symbolic math skills</a>.</p>
 <p>When randomised experiments are impossible, we can sometimes leverage natural experiments or use other causal analysis methods too.</p>
 </section>
 <section id="final-note" class="level1">
 <h1>Final note</h1>
-<p>If our goal is to show that a specific domain of cognition is important for a specific outcome, simply showing a statistically significant association when controlling for nonverbal reasoning is a really limited approach. Using effect sizes or testing other structural hypotheses in a more principled way is a much better.</p>
-<p>There is nothing inherently wrong with nonverbal reasoning assessments, but we should be cautious when using them as proxy measures of general cognitive ability/intelligence/IQ.</p>
+<p>If our goal is to show that a specific domain of cognition is important for a specific outcome, simply showing that a statistically significant effect when controlling for non-verbal reasoning is a really limited approach. Using effect sizes, or testing generative hypotheses in a more principled way is a much better approach.</p>
+<p>There is nothing inherently wrong with non-verbal reaosning assessments, but we should be really careful when using them as proxy measures of general cognitive ability/intelligence/IQ.</p>
 </section>
 <section id="further-reading" class="level1">
 <h1>Further Reading</h1>
-<p>Residual confounding is widely discussed in epidemiology &amp; biostatistics, but there have been some nice articles written for psychology audiences:</p>
+<p>Residual confounding is widely discussed in epidemiology &amp; biostatistcs, but there have been some nice articles written for psychology audiences:</p>
 <p><a href="https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0152719">Westfall, J., &amp; Yarkoni, T. (2016). Statistically controlling for confounding constructs is harder than you think. PloS one, 11(3), e0152719.</a></p>
 <p><a href="https://pubmed.ncbi.nlm.nih.gov/5851540/">Kahneman, D. (1965). Control of spurious association and the reliability of the controlled variable. Psychological Bulletin, 64(5), 326.</a></p>
-<p>On the topic of measuring “IQ” with nonverbal reasoning:</p>
+<p>On the topic of measuring “IQ” with non-verbal reasoning:</p>
 <p><a href="https://www.sciencedirect.com/science/article/abs/pii/S0160289615001002">Gignac, G. E. (2015). Raven’s is not a pure measure of general intelligence: Implications for g factor theory and the brief measurement of g. Intelligence, 52, 71-79.</a></p>
 <p>Applied Example Using Latent Variable Modelling Approach:</p>
 <p><a href="https://pubmed.ncbi.nlm.nih.gov/37853931/">Bignardi, G., Mareva, S., &amp; Astle, D. E. (2024). Parental socioeconomic status weakly predicts specific cognitive and academic skills beyond general cognitive ability. Developmental Science, 27(2), e13451.</a></p>
