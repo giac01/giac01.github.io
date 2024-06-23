@@ -9,7 +9,7 @@
 <meta name="author" content="Giacomo Bignardi">
 <meta name="dcterms.date" content="2099-06-16">
 
-<title>Giacomo Bignardi, PhD - Tutorial: Calculating relative measurement precision (RMP) for a go/no-go task</title>
+<title>Giacomo Bignardi, PhD - Tutorial: Calculating internal consistency reliability for a go/no-go task</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -176,7 +176,7 @@ window.Quarto = {
 <header id="title-block-header" class="quarto-title-block default page-columns page-full">
   <div class="quarto-title-banner page-columns page-full">
     <div class="quarto-title column-body">
-      <h1 class="title">Tutorial: Calculating relative measurement precision (RMP) for a go/no-go task</h1>
+      <h1 class="title">Tutorial: Calculating internal consistency reliability for a go/no-go task</h1>
                                 <div class="quarto-categories">
                 <div class="quarto-category">reliability</div>
                 <div class="quarto-category">cognition</div>
@@ -966,17 +966,17 @@ Multilevel Hyperparameters:
 ~pps (Number of levels: 107) 
                                   Estimate Est.Error l-95% CI u-95% CI Rhat
 sd(Intercept)                         0.26      0.02     0.22     0.31 1.00
-sd(condition_contrast)                1.00      0.07     0.87     1.16 1.00
-cor(Intercept,condition_contrast)     0.33      0.10     0.13     0.51 1.00
+sd(condition_contrast)                1.00      0.07     0.87     1.15 1.00
+cor(Intercept,condition_contrast)     0.33      0.10     0.13     0.52 1.00
                                   Bulk_ESS Tail_ESS
-sd(Intercept)                         2993     3860
-sd(condition_contrast)                1890     3720
-cor(Intercept,condition_contrast)     1067     2087
+sd(Intercept)                         3260     4901
+sd(condition_contrast)                1881     3548
+cor(Intercept,condition_contrast)      978     1710
 
 Regression Coefficients:
                    Estimate Est.Error l-95% CI u-95% CI Rhat Bulk_ESS Tail_ESS
-Intercept              0.78      0.03     0.73     0.84 1.00     2488     3883
-condition_contrast     3.13      0.10     2.94     3.33 1.00     1297     2460
+Intercept              0.78      0.03     0.73     0.84 1.00     2535     4301
+condition_contrast     3.13      0.10     2.95     3.33 1.00     1459     2792
 
 Draws were sampled using sample(hmc). For each parameter, Bulk_ESS
 and Tail_ESS are effective sample size measures, and Rhat is the potential
@@ -1058,53 +1058,34 @@ r_pps[11,condition_contrast] 4.789330 4.277429 4.404580 4.513110</code></pre>
 </section>
 <section id="calculate-reliability" class="level1">
 <h1>Calculate Reliability</h1>
-<p>Our reliability algorithm:</p>
+<p>The code to calculate reliability using the posterior draw matrix is relatively simple. You can either <a href="https://github.com/giac01/gbtoolbox/blob/main/R/reliability.R">copy and paste the code directly from the github page</a> or download my R package of miscellaneous R functions <code>gbtoolbox</code> available on github.</p>
+<p>Install R package from github:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>relative_measurement_precision <span class="ot">=</span> <span class="cf">function</span>(</span>
-<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>    input_draws,</span>
-<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">verbose =</span> <span class="cn">TRUE</span></span>
-<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a>){</span>
-<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb20-6"><a href="#cb20-6" aria-hidden="true" tabindex="-1"></a>  input_draws <span class="ot">=</span> <span class="fu">as.matrix</span>(input_draws)</span>
-<span id="cb20-7"><a href="#cb20-7" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb20-8"><a href="#cb20-8" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (verbose){</span>
-<span id="cb20-9"><a href="#cb20-9" aria-hidden="true" tabindex="-1"></a>    <span class="fu">print</span>(<span class="fu">paste0</span>(<span class="st">"Number of subjects: "</span>, <span class="fu">nrow</span>(input_draws)))</span>
-<span id="cb20-10"><a href="#cb20-10" aria-hidden="true" tabindex="-1"></a>    <span class="fu">print</span>(<span class="fu">paste0</span>(<span class="st">"Number of posterior draws: "</span>, <span class="fu">ncol</span>(input_draws)))</span>
-<span id="cb20-11"><a href="#cb20-11" aria-hidden="true" tabindex="-1"></a>  }</span>
-<span id="cb20-12"><a href="#cb20-12" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb20-13"><a href="#cb20-13" aria-hidden="true" tabindex="-1"></a>  col_select <span class="ot">=</span> <span class="fu">sample</span>(<span class="dv">1</span><span class="sc">:</span><span class="fu">ncol</span>(input_draws), <span class="at">replace =</span> F)</span>
-<span id="cb20-14"><a href="#cb20-14" aria-hidden="true" tabindex="-1"></a>  input_draws_1 <span class="ot">=</span> input_draws[,col_select[<span class="dv">1</span><span class="sc">:</span>(<span class="fu">length</span>(col_select)<span class="sc">/</span><span class="dv">2</span>)]]  </span>
-<span id="cb20-15"><a href="#cb20-15" aria-hidden="true" tabindex="-1"></a>  input_draws_2 <span class="ot">=</span> input_draws[,col_select[(<span class="fu">length</span>(col_select)<span class="sc">/</span><span class="dv">2</span><span class="sc">+</span><span class="dv">1</span>)<span class="sc">:</span><span class="fu">length</span>(col_select)]] </span>
-<span id="cb20-16"><a href="#cb20-16" aria-hidden="true" tabindex="-1"></a>  rmp_posterior <span class="ot">=</span> <span class="fu">sapply</span>(<span class="dv">1</span><span class="sc">:</span><span class="fu">ncol</span>(input_draws_1), <span class="cf">function</span>(i) <span class="fu">cor</span>(input_draws_1[,i],input_draws_2[,i], <span class="at">method =</span> <span class="st">"pearson"</span>))</span>
-<span id="cb20-17"><a href="#cb20-17" aria-hidden="true" tabindex="-1"></a>  hdci <span class="ot">=</span> ggdist<span class="sc">::</span><span class="fu">mean_hdci</span>(rmp_posterior, <span class="at">.width =</span> <span class="fl">0.95</span>)</span>
-<span id="cb20-18"><a href="#cb20-18" aria-hidden="true" tabindex="-1"></a>  pd <span class="ot">=</span> bayestestR<span class="sc">::</span><span class="fu">p_direction</span>(rmp_posterior)<span class="sc">$</span>pd</span>
-<span id="cb20-19"><a href="#cb20-19" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb20-20"><a href="#cb20-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(<span class="fu">list</span>(<span class="at">hdci =</span> hdci, <span class="at">pd =</span> pd, <span class="at">rmp_posterior =</span> rmp_posterior,<span class="at">input_draws_1=</span>input_draws_1,<span class="at">input_draws_2=</span>input_draws_2))</span>
-<span id="cb20-21"><a href="#cb20-21" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>devtools<span class="sc">::</span><span class="fu">install_github</span>(<span class="st">"giac01/gbtoolbox"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>Calculate relative measurement precision at each time point:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a>rmp_time1 <span class="ot">=</span> <span class="fu">relative_measurement_precision</span>(subj_draws_time_1)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a>internalconsistency_time1 <span class="ot">=</span> gbtoolbox<span class="sc">::</span><span class="fu">reliability</span>(subj_draws_time_1)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] "Number of subjects: 107"
 [1] "Number of posterior draws: 10000"</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a>rmp_time2 <span class="ot">=</span> <span class="fu">relative_measurement_precision</span>(subj_draws_time_2)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a>internalconsistency_time2 <span class="ot">=</span> gbtoolbox<span class="sc">::</span><span class="fu">reliability</span>(subj_draws_time_2)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] "Number of subjects: 107"
 [1] "Number of posterior draws: 10000"</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a>rmp_time1<span class="sc">$</span>hdci</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a>internalconsistency_time1<span class="sc">$</span>hdci</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>          y     ymin      ymax .width .point .interval
 1 0.8937231 0.863525 0.9231702   0.95   mean      hdci</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb27"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a>rmp_time2<span class="sc">$</span>hdci</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb27"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a>internalconsistency_time2<span class="sc">$</span>hdci</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>          y      ymin      ymax .width .point .interval
-1 0.9307084 0.9087029 0.9507524   0.95   mean      hdci</code></pre>
+1 0.9310258 0.9109792 0.9515158   0.95   mean      hdci</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb29"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a>predicted_test_retest <span class="ot">=</span> <span class="fu">sqrt</span>(rmp_time1<span class="sc">$</span>rmp_posterior<span class="sc">*</span>rmp_time2<span class="sc">$</span>rmp_posterior)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb29"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a>predicted_test_retest <span class="ot">=</span> <span class="fu">sqrt</span>(internalconsistency_time1<span class="sc">$</span>reliability_posterior<span class="sc">*</span>internalconsistency_time2<span class="sc">$</span>reliability_posterior)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>Relative measurement precision indicates that reliability at the first time point was 89% (95% Credible Interval = 86%-92%), and at the second time point reliability was 93% (95% CI[91%, 95%]).</p>
 <p>The test-retest reliability is a little lower than these estimates (r = 0.73), as we might expect:</p>
@@ -1115,13 +1096,13 @@ r_pps[11,condition_contrast] 4.789330 4.277429 4.404580 4.513110</code></pre>
     Pearson's product-moment correlation
 
 data:  subj_est_time_1 and subj_est_time_2
-t = 10.872, df = 105, p-value &lt; 2.2e-16
+t = 10.881, df = 105, p-value &lt; 2.2e-16
 alternative hypothesis: true correlation is not equal to 0
 95 percent confidence interval:
- 0.6240688 0.8061810
+ 0.6244561 0.8064030
 sample estimates:
       cor 
-0.7277053 </code></pre>
+0.7280037 </code></pre>
 </div>
 </div>
 <p>If there were no changes in individuals latent (true) <code>d'</code> values across the conditions, the population test-rest reliability and internal consistency should be identical. Because some change is inevitable, test-retest reliability will usually be a bit lower than internal consistency.</p>
@@ -1166,7 +1147,7 @@ sample estimates:
 <section id="plot-different-reliability-posterior-distributions" class="level1">
 <h1>Plot different reliability posterior distributions</h1>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb33"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a><span class="fu">data.frame</span>(<span class="st">`</span><span class="at">Test-Retest Posterior</span><span class="st">`</span> <span class="ot">=</span> test_retest_cor_posterior<span class="sc">$</span>rescor__subjesttime2__subjesttime1, <span class="st">`</span><span class="at">Internal Consistency Time 1</span><span class="st">`</span> <span class="ot">=</span> rmp_time1<span class="sc">$</span>rmp_posterior,  <span class="st">`</span><span class="at">Internal Consistency Time 2</span><span class="st">`</span> <span class="ot">=</span> rmp_time2<span class="sc">$</span>rmp_posterior) <span class="sc">%&gt;%</span> </span>
+<div class="sourceCode cell-code" id="cb33"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a><span class="fu">data.frame</span>(<span class="st">`</span><span class="at">Test-Retest Posterior</span><span class="st">`</span> <span class="ot">=</span> test_retest_cor_posterior<span class="sc">$</span>rescor__subjesttime2__subjesttime1, <span class="st">`</span><span class="at">Internal Consistency Time 1</span><span class="st">`</span> <span class="ot">=</span> internalconsistency_time1<span class="sc">$</span>reliability_posterior,  <span class="st">`</span><span class="at">Internal Consistency Time 2</span><span class="st">`</span> <span class="ot">=</span> internalconsistency_time2<span class="sc">$</span>reliability_posterior) <span class="sc">%&gt;%</span> </span>
 <span id="cb33-2"><a href="#cb33-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_longer</span>(<span class="at">cols =</span> <span class="fu">everything</span>()) <span class="sc">%&gt;%</span></span>
 <span id="cb33-3"><a href="#cb33-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> value, <span class="at">group =</span> name, <span class="at">col =</span> name, <span class="at">fill =</span> name)) <span class="sc">+</span></span>
 <span id="cb33-4"><a href="#cb33-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_density</span>(<span class="at">alpha =</span> .<span class="dv">3</span>) <span class="sc">+</span> </span>
