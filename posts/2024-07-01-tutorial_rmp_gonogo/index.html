@@ -9,7 +9,7 @@
 <meta name="author" content="Giacomo Bignardi">
 <meta name="dcterms.date" content="2099-06-16">
 
-<title>Giacomo Bignardi, PhD - Tutorial: Calculating relative measurement precision (RMP) for a go/nogo task</title>
+<title>Giacomo Bignardi, PhD - Tutorial: Calculating relative measurement precision (RMP) for a go/no-go task</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -176,7 +176,7 @@ window.Quarto = {
 <header id="title-block-header" class="quarto-title-block default page-columns page-full">
   <div class="quarto-title-banner page-columns page-full">
     <div class="quarto-title column-body">
-      <h1 class="title">Tutorial: Calculating relative measurement precision (RMP) for a go/nogo task</h1>
+      <h1 class="title">Tutorial: Calculating relative measurement precision (RMP) for a go/no-go task</h1>
                                 <div class="quarto-categories">
                 <div class="quarto-category">reliability</div>
                 <div class="quarto-category">cognition</div>
@@ -222,9 +222,9 @@ window.Quarto = {
   <li><a href="#introduction" id="toc-introduction" class="nav-link active" data-scroll-target="#introduction">Introduction</a>
   <ul class="collapse">
   <li><a href="#load-data-from-hedges-reliability-paradox-paper" id="toc-load-data-from-hedges-reliability-paradox-paper" class="nav-link" data-scroll-target="#load-data-from-hedges-reliability-paradox-paper">Load Data from Hedge’s “Reliability Paradox” paper</a></li>
-  <li><a href="#go-nogo-modelling" id="toc-go-nogo-modelling" class="nav-link" data-scroll-target="#go-nogo-modelling">Go-nogo Modelling</a></li>
+  <li><a href="#gono-go-modelling" id="toc-gono-go-modelling" class="nav-link" data-scroll-target="#gono-go-modelling">Go/no-go Modelling</a></li>
   <li><a href="#summarise-data" id="toc-summarise-data" class="nav-link" data-scroll-target="#summarise-data">Summarise data</a></li>
-  <li><a href="#fit-signal-detection-models-on-each-session-time-point" id="toc-fit-signal-detection-models-on-each-session-time-point" class="nav-link" data-scroll-target="#fit-signal-detection-models-on-each-session-time-point">Fit signal detection models on each session (time point)</a>
+  <li><a href="#fit-bayesian-signal-detection-theory-models" id="toc-fit-bayesian-signal-detection-theory-models" class="nav-link" data-scroll-target="#fit-bayesian-signal-detection-theory-models">Fit Bayesian signal detection theory models</a>
   <ul class="collapse">
   <li><a href="#model-results" id="toc-model-results" class="nav-link" data-scroll-target="#model-results">Model results</a></li>
   </ul></li>
@@ -245,7 +245,8 @@ window.Quarto = {
 
 <section id="introduction" class="level1">
 <h1>Introduction</h1>
-<p>This is a short walk-through of how to calculate relative measurement precision (RMP) internal consistency for <code>d'</code> for a go-nogo task.</p>
+<p>This is a short walk-through of how to calculate relative measurement precision (RMP) internal consistency for <code>d'</code> for a go/no-go task.</p>
+<p>For more information about RMP, see our <a href="#0">pre-print</a> (ADD LINK).</p>
 <p>For a more detailed tutorial and background on signal detection theory models, I’d recommend the first few chapters of <a href="https://www.routledge.com/Detection-Theory-A-Users-Guide/Hautus-Macmillan-Creelman/p/book/9781138320857">Dection Theory: A User’s Guide</a> and <a href="https://mvuorre.github.io/posts/2017-10-09-bayesian-estimation-of-signal-detection-theory-models/">Matti Vourre’s Excellent Blog</a>, which will explain how these models work in more detail.</p>
 <section id="load-data-from-hedges-reliability-paradox-paper" class="level2">
 <h2 class="anchored" data-anchor-id="load-data-from-hedges-reliability-paradox-paper">Load Data from Hedge’s “Reliability Paradox” paper</h2>
@@ -254,39 +255,40 @@ window.Quarto = {
 <p>Reference: <a href="https://link.springer.com/article/10.3758/s13428-017-0935-1">Hedge, C., Powell, G., &amp; Sumner, P. (2018). The reliability paradox: Why robust cognitive tasks do not produce reliable individual differences. Behavior research methods, 50, 1166-1186.</a></p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">rm</span>(<span class="at">list=</span><span class="fu">ls</span>(<span class="at">all.names =</span> T))</span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidybayes)</span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(brms)</span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>path_to_data <span class="ot">=</span> <span class="fu">file.path</span>(<span class="st">"data"</span>,<span class="st">"osf_hedge_cwzds"</span>)</span>
-<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>data_files   <span class="ot">=</span> <span class="fu">list.files</span>(<span class="fu">file.path</span>(<span class="st">"data"</span>,<span class="st">"osf_hedge_cwzds"</span>), <span class="at">all.files =</span> <span class="cn">TRUE</span>, <span class="at">recursive =</span> <span class="cn">TRUE</span>, <span class="at">pattern =</span> <span class="st">".csv$"</span>, <span class="at">full.names =</span> <span class="cn">TRUE</span> )</span>
-<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>data_list    <span class="ot">=</span> <span class="fu">lapply</span>(data_files, <span class="cf">function</span>(x) </span>
-<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">read.csv</span>(</span>
-<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>    <span class="at">file =</span> x, </span>
-<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>    <span class="at">header =</span> <span class="cn">FALSE</span>,</span>
-<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>    <span class="at">col.names =</span> <span class="fu">c</span>(<span class="st">"block"</span>,<span class="st">"trial"</span>,<span class="st">"stimulus"</span>,<span class="st">"condition"</span>,<span class="st">"correct"</span>,<span class="st">"rt"</span>)</span>
-<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>    )</span>
-<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>  )</span>
-<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a>study_numbers       <span class="ot">&lt;-</span> <span class="fu">as.integer</span>(<span class="fu">sub</span>(<span class="st">".*Study(</span><span class="sc">\\</span><span class="st">d+)_P(</span><span class="sc">\\</span><span class="st">d+)gng(</span><span class="sc">\\</span><span class="st">d+)</span><span class="sc">\\</span><span class="st">.csv"</span>, <span class="st">"</span><span class="sc">\\</span><span class="st">1"</span>, data_files))</span>
-<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a>participant_numbers <span class="ot">&lt;-</span> <span class="fu">as.integer</span>(<span class="fu">sub</span>(<span class="st">".*Study(</span><span class="sc">\\</span><span class="st">d+)_P(</span><span class="sc">\\</span><span class="st">d+)gng(</span><span class="sc">\\</span><span class="st">d+)</span><span class="sc">\\</span><span class="st">.csv"</span>, <span class="st">"</span><span class="sc">\\</span><span class="st">2"</span>, data_files))</span>
-<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a>session_numbers     <span class="ot">&lt;-</span> <span class="fu">as.integer</span>(<span class="fu">sub</span>(<span class="st">".*Study(</span><span class="sc">\\</span><span class="st">d+)_P(</span><span class="sc">\\</span><span class="st">d+)gng(</span><span class="sc">\\</span><span class="st">d+)</span><span class="sc">\\</span><span class="st">.csv"</span>, <span class="st">"</span><span class="sc">\\</span><span class="st">3"</span>, data_files))</span>
-<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> (i <span class="cf">in</span> <span class="fu">seq_along</span>(data_files)){</span>
-<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a>  data_list[[i]]<span class="sc">$</span>study   <span class="ot">=</span> study_numbers[i]</span>
-<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a>  data_list[[i]]<span class="sc">$</span>session <span class="ot">=</span> session_numbers[i]</span>
-<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (study_numbers[i] <span class="sc">==</span><span class="dv">2</span>) {participant_numbers[i] <span class="ot">=</span> participant_numbers[i] <span class="sc">+</span> <span class="dv">1000</span>}</span>
-<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a>  data_list[[i]]<span class="sc">$</span>pps     <span class="ot">=</span> participant_numbers[i]</span>
-<span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a>}</span>
-<span id="cb1-27"><a href="#cb1-27" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-28"><a href="#cb1-28" aria-hidden="true" tabindex="-1"></a>data_long <span class="ot">=</span> <span class="fu">do.call</span>(<span class="st">"bind_rows"</span>, data_list)</span>
-<span id="cb1-29"><a href="#cb1-29" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-30"><a href="#cb1-30" aria-hidden="true" tabindex="-1"></a>data_long <span class="ot">=</span> data_long <span class="sc">%&gt;%</span></span>
-<span id="cb1-31"><a href="#cb1-31" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(pps, session)</span>
-<span id="cb1-32"><a href="#cb1-32" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-33"><a href="#cb1-33" aria-hidden="true" tabindex="-1"></a>data_long <span class="sc">%&gt;%</span></span>
-<span id="cb1-34"><a href="#cb1-34" aria-hidden="true" tabindex="-1"></a>  <span class="fu">slice</span>(<span class="dv">1</span><span class="sc">:</span><span class="dv">15</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">10</span>)</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidybayes)</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(brms)</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>path_to_data <span class="ot">=</span> <span class="fu">file.path</span>(<span class="st">"data"</span>,<span class="st">"osf_hedge_cwzds"</span>)</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>data_files   <span class="ot">=</span> <span class="fu">list.files</span>(<span class="fu">file.path</span>(<span class="st">"data"</span>,<span class="st">"osf_hedge_cwzds"</span>), <span class="at">all.files =</span> <span class="cn">TRUE</span>, <span class="at">recursive =</span> <span class="cn">TRUE</span>, <span class="at">pattern =</span> <span class="st">".csv$"</span>, <span class="at">full.names =</span> <span class="cn">TRUE</span> )</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>data_list    <span class="ot">=</span> <span class="fu">lapply</span>(data_files, <span class="cf">function</span>(x) </span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">read.csv</span>(</span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>    <span class="at">file =</span> x, </span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>    <span class="at">header =</span> <span class="cn">FALSE</span>,</span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>    <span class="at">col.names =</span> <span class="fu">c</span>(<span class="st">"block"</span>,<span class="st">"trial"</span>,<span class="st">"stimulus"</span>,<span class="st">"condition"</span>,<span class="st">"correct"</span>,<span class="st">"rt"</span>)</span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a>study_numbers       <span class="ot">&lt;-</span> <span class="fu">as.integer</span>(<span class="fu">sub</span>(<span class="st">".*Study(</span><span class="sc">\\</span><span class="st">d+)_P(</span><span class="sc">\\</span><span class="st">d+)gng(</span><span class="sc">\\</span><span class="st">d+)</span><span class="sc">\\</span><span class="st">.csv"</span>, <span class="st">"</span><span class="sc">\\</span><span class="st">1"</span>, data_files))</span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a>participant_numbers <span class="ot">&lt;-</span> <span class="fu">as.integer</span>(<span class="fu">sub</span>(<span class="st">".*Study(</span><span class="sc">\\</span><span class="st">d+)_P(</span><span class="sc">\\</span><span class="st">d+)gng(</span><span class="sc">\\</span><span class="st">d+)</span><span class="sc">\\</span><span class="st">.csv"</span>, <span class="st">"</span><span class="sc">\\</span><span class="st">2"</span>, data_files))</span>
+<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a>session_numbers     <span class="ot">&lt;-</span> <span class="fu">as.integer</span>(<span class="fu">sub</span>(<span class="st">".*Study(</span><span class="sc">\\</span><span class="st">d+)_P(</span><span class="sc">\\</span><span class="st">d+)gng(</span><span class="sc">\\</span><span class="st">d+)</span><span class="sc">\\</span><span class="st">.csv"</span>, <span class="st">"</span><span class="sc">\\</span><span class="st">3"</span>, data_files))</span>
+<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> (i <span class="cf">in</span> <span class="fu">seq_along</span>(data_files)){</span>
+<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a>  data_list[[i]]<span class="sc">$</span>study   <span class="ot">=</span> study_numbers[i]</span>
+<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a>  data_list[[i]]<span class="sc">$</span>session <span class="ot">=</span> session_numbers[i]</span>
+<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (study_numbers[i] <span class="sc">==</span><span class="dv">2</span>) {participant_numbers[i] <span class="ot">=</span> participant_numbers[i] <span class="sc">+</span> <span class="dv">1000</span>}</span>
+<span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a>  data_list[[i]]<span class="sc">$</span>pps     <span class="ot">=</span> participant_numbers[i]</span>
+<span id="cb1-27"><a href="#cb1-27" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb1-28"><a href="#cb1-28" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-29"><a href="#cb1-29" aria-hidden="true" tabindex="-1"></a>data_long <span class="ot">=</span> <span class="fu">do.call</span>(<span class="st">"bind_rows"</span>, data_list)</span>
+<span id="cb1-30"><a href="#cb1-30" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-31"><a href="#cb1-31" aria-hidden="true" tabindex="-1"></a>data_long <span class="ot">=</span> data_long <span class="sc">%&gt;%</span></span>
+<span id="cb1-32"><a href="#cb1-32" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(pps, session)</span>
+<span id="cb1-33"><a href="#cb1-33" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-34"><a href="#cb1-34" aria-hidden="true" tabindex="-1"></a>data_long <span class="sc">%&gt;%</span></span>
+<span id="cb1-35"><a href="#cb1-35" aria-hidden="true" tabindex="-1"></a>  <span class="fu">slice</span>(<span class="dv">1</span><span class="sc">:</span><span class="dv">15</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>   block trial stimulus condition correct      rt study session pps
 1      1     1        4         0       1 0.82081     1       1   1
@@ -307,27 +309,28 @@ window.Quarto = {
 </div>
 </div>
 </section>
-<section id="go-nogo-modelling" class="level2">
-<h2 class="anchored" data-anchor-id="go-nogo-modelling">Go-nogo Modelling</h2>
+<section id="gono-go-modelling" class="level2">
+<h2 class="anchored" data-anchor-id="gono-go-modelling">Go/no-go Modelling</h2>
+<p>In this go/no-go task, one of four letters is shown on screen. Participants are told to press the space bar as quickly as possible to three of the four letters (the “go” condition trials) and to not press the space bar if one of the letters appears on screen (the “no-go” condition trials).</p>
 <div class="cell">
 <div class="cell-output-display">
-<div id="fcibswoxlv" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
-<style>#fcibswoxlv table {
+<div id="jewizkjwzu" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<style>#jewizkjwzu table {
   font-family: system-ui, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-#fcibswoxlv thead, #fcibswoxlv tbody, #fcibswoxlv tfoot, #fcibswoxlv tr, #fcibswoxlv td, #fcibswoxlv th {
+#jewizkjwzu thead, #jewizkjwzu tbody, #jewizkjwzu tfoot, #jewizkjwzu tr, #jewizkjwzu td, #jewizkjwzu th {
   border-style: none;
 }
 
-#fcibswoxlv p {
+#jewizkjwzu p {
   margin: 0;
   padding: 0;
 }
 
-#fcibswoxlv .gt_table {
+#jewizkjwzu .gt_table {
   display: table;
   border-collapse: collapse;
   line-height: normal;
@@ -353,12 +356,12 @@ window.Quarto = {
   border-left-color: #D3D3D3;
 }
 
-#fcibswoxlv .gt_caption {
+#jewizkjwzu .gt_caption {
   padding-top: 4px;
   padding-bottom: 4px;
 }
 
-#fcibswoxlv .gt_title {
+#jewizkjwzu .gt_title {
   color: #333333;
   font-size: 125%;
   font-weight: initial;
@@ -370,7 +373,7 @@ window.Quarto = {
   border-bottom-width: 0;
 }
 
-#fcibswoxlv .gt_subtitle {
+#jewizkjwzu .gt_subtitle {
   color: #333333;
   font-size: 85%;
   font-weight: initial;
@@ -382,7 +385,7 @@ window.Quarto = {
   border-top-width: 0;
 }
 
-#fcibswoxlv .gt_heading {
+#jewizkjwzu .gt_heading {
   background-color: #FFFFFF;
   text-align: center;
   border-bottom-color: #FFFFFF;
@@ -394,13 +397,13 @@ window.Quarto = {
   border-right-color: #D3D3D3;
 }
 
-#fcibswoxlv .gt_bottom_border {
+#jewizkjwzu .gt_bottom_border {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
 }
 
-#fcibswoxlv .gt_col_headings {
+#jewizkjwzu .gt_col_headings {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -415,7 +418,7 @@ window.Quarto = {
   border-right-color: #D3D3D3;
 }
 
-#fcibswoxlv .gt_col_heading {
+#jewizkjwzu .gt_col_heading {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -435,7 +438,7 @@ window.Quarto = {
   overflow-x: hidden;
 }
 
-#fcibswoxlv .gt_column_spanner_outer {
+#jewizkjwzu .gt_column_spanner_outer {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -447,15 +450,15 @@ window.Quarto = {
   padding-right: 4px;
 }
 
-#fcibswoxlv .gt_column_spanner_outer:first-child {
+#jewizkjwzu .gt_column_spanner_outer:first-child {
   padding-left: 0;
 }
 
-#fcibswoxlv .gt_column_spanner_outer:last-child {
+#jewizkjwzu .gt_column_spanner_outer:last-child {
   padding-right: 0;
 }
 
-#fcibswoxlv .gt_column_spanner {
+#jewizkjwzu .gt_column_spanner {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
@@ -467,11 +470,11 @@ window.Quarto = {
   width: 100%;
 }
 
-#fcibswoxlv .gt_spanner_row {
+#jewizkjwzu .gt_spanner_row {
   border-bottom-style: hidden;
 }
 
-#fcibswoxlv .gt_group_heading {
+#jewizkjwzu .gt_group_heading {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -497,7 +500,7 @@ window.Quarto = {
   text-align: left;
 }
 
-#fcibswoxlv .gt_empty_group_heading {
+#jewizkjwzu .gt_empty_group_heading {
   padding: 0.5px;
   color: #333333;
   background-color: #FFFFFF;
@@ -512,15 +515,15 @@ window.Quarto = {
   vertical-align: middle;
 }
 
-#fcibswoxlv .gt_from_md > :first-child {
+#jewizkjwzu .gt_from_md > :first-child {
   margin-top: 0;
 }
 
-#fcibswoxlv .gt_from_md > :last-child {
+#jewizkjwzu .gt_from_md > :last-child {
   margin-bottom: 0;
 }
 
-#fcibswoxlv .gt_row {
+#jewizkjwzu .gt_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -539,7 +542,7 @@ window.Quarto = {
   overflow-x: hidden;
 }
 
-#fcibswoxlv .gt_stub {
+#jewizkjwzu .gt_stub {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -552,7 +555,7 @@ window.Quarto = {
   padding-right: 5px;
 }
 
-#fcibswoxlv .gt_stub_row_group {
+#jewizkjwzu .gt_stub_row_group {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -566,15 +569,15 @@ window.Quarto = {
   vertical-align: top;
 }
 
-#fcibswoxlv .gt_row_group_first td {
+#jewizkjwzu .gt_row_group_first td {
   border-top-width: 2px;
 }
 
-#fcibswoxlv .gt_row_group_first th {
+#jewizkjwzu .gt_row_group_first th {
   border-top-width: 2px;
 }
 
-#fcibswoxlv .gt_summary_row {
+#jewizkjwzu .gt_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -584,16 +587,16 @@ window.Quarto = {
   padding-right: 5px;
 }
 
-#fcibswoxlv .gt_first_summary_row {
+#jewizkjwzu .gt_first_summary_row {
   border-top-style: solid;
   border-top-color: #D3D3D3;
 }
 
-#fcibswoxlv .gt_first_summary_row.thick {
+#jewizkjwzu .gt_first_summary_row.thick {
   border-top-width: 2px;
 }
 
-#fcibswoxlv .gt_last_summary_row {
+#jewizkjwzu .gt_last_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -603,7 +606,7 @@ window.Quarto = {
   border-bottom-color: #D3D3D3;
 }
 
-#fcibswoxlv .gt_grand_summary_row {
+#jewizkjwzu .gt_grand_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -613,7 +616,7 @@ window.Quarto = {
   padding-right: 5px;
 }
 
-#fcibswoxlv .gt_first_grand_summary_row {
+#jewizkjwzu .gt_first_grand_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -623,7 +626,7 @@ window.Quarto = {
   border-top-color: #D3D3D3;
 }
 
-#fcibswoxlv .gt_last_grand_summary_row_top {
+#jewizkjwzu .gt_last_grand_summary_row_top {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -633,11 +636,11 @@ window.Quarto = {
   border-bottom-color: #D3D3D3;
 }
 
-#fcibswoxlv .gt_striped {
+#jewizkjwzu .gt_striped {
   background-color: rgba(128, 128, 128, 0.05);
 }
 
-#fcibswoxlv .gt_table_body {
+#jewizkjwzu .gt_table_body {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -646,7 +649,7 @@ window.Quarto = {
   border-bottom-color: #D3D3D3;
 }
 
-#fcibswoxlv .gt_footnotes {
+#jewizkjwzu .gt_footnotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -660,7 +663,7 @@ window.Quarto = {
   border-right-color: #D3D3D3;
 }
 
-#fcibswoxlv .gt_footnote {
+#jewizkjwzu .gt_footnote {
   margin: 0px;
   font-size: 90%;
   padding-top: 4px;
@@ -669,7 +672,7 @@ window.Quarto = {
   padding-right: 5px;
 }
 
-#fcibswoxlv .gt_sourcenotes {
+#jewizkjwzu .gt_sourcenotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -683,7 +686,7 @@ window.Quarto = {
   border-right-color: #D3D3D3;
 }
 
-#fcibswoxlv .gt_sourcenote {
+#jewizkjwzu .gt_sourcenote {
   font-size: 90%;
   padding-top: 4px;
   padding-bottom: 4px;
@@ -691,63 +694,63 @@ window.Quarto = {
   padding-right: 5px;
 }
 
-#fcibswoxlv .gt_left {
+#jewizkjwzu .gt_left {
   text-align: left;
 }
 
-#fcibswoxlv .gt_center {
+#jewizkjwzu .gt_center {
   text-align: center;
 }
 
-#fcibswoxlv .gt_right {
+#jewizkjwzu .gt_right {
   text-align: right;
   font-variant-numeric: tabular-nums;
 }
 
-#fcibswoxlv .gt_font_normal {
+#jewizkjwzu .gt_font_normal {
   font-weight: normal;
 }
 
-#fcibswoxlv .gt_font_bold {
+#jewizkjwzu .gt_font_bold {
   font-weight: bold;
 }
 
-#fcibswoxlv .gt_font_italic {
+#jewizkjwzu .gt_font_italic {
   font-style: italic;
 }
 
-#fcibswoxlv .gt_super {
+#jewizkjwzu .gt_super {
   font-size: 65%;
 }
 
-#fcibswoxlv .gt_footnote_marks {
+#jewizkjwzu .gt_footnote_marks {
   font-size: 75%;
   vertical-align: 0.4em;
   position: initial;
 }
 
-#fcibswoxlv .gt_asterisk {
+#jewizkjwzu .gt_asterisk {
   font-size: 100%;
   vertical-align: 0;
 }
 
-#fcibswoxlv .gt_indent_1 {
+#jewizkjwzu .gt_indent_1 {
   text-indent: 5px;
 }
 
-#fcibswoxlv .gt_indent_2 {
+#jewizkjwzu .gt_indent_2 {
   text-indent: 10px;
 }
 
-#fcibswoxlv .gt_indent_3 {
+#jewizkjwzu .gt_indent_3 {
   text-indent: 15px;
 }
 
-#fcibswoxlv .gt_indent_4 {
+#jewizkjwzu .gt_indent_4 {
   text-indent: 20px;
 }
 
-#fcibswoxlv .gt_indent_5 {
+#jewizkjwzu .gt_indent_5 {
   text-indent: 25px;
 }
 </style>
@@ -780,19 +783,19 @@ window.Quarto = {
 </div>
 </div>
 </div>
-<p>We will analyse the go/no-go task using a signal detection theory model to derive a measure performance called sensitivity or <code>d'</code>.</p>
+<p>We will analyse the go/no-go task using a signal detection theory model to derive a measure of performance called sensitivity or <code>d'</code>.</p>
 <p>We can derive d’ using a random intercept and slope binomial regression model.</p>
-<p>The number of “go” responses will be the outcome variable. Condition (go/nogo) will be our predictor. In the “go” condition, we expect the number of go responses to be higher than the “no-go” condition. The sensitivity or <code>d'</code> parameter measures how well participants shift their probability of responding “go” in the no-go and go conditions.</p>
-<p>We can numerically calculate (d’) ((d’)) as a function of hit rate ((HR)) and false alarm rate ((FAR)) is given by:</p>
+<p>The number of “go” responses will be the outcome variable. Condition (go/no-go) will be our predictor. In the “go” condition, we expect the number of go responses to be higher than the “no-go” condition. The sensitivity or <code>d'</code> parameter measures how well participants shift their probability of responding “go” in the no-go and go conditions.</p>
+<p>We can calculate d’ directly using a participant’s hit rate (HR; proportion of Go responses in the Go condition) and false alarm rate (FAR; proportion of Go responses in the No-Go condition):</p>
 <p><span class="math display">\[
 d' = \Phi^{-1}(HR) - \Phi^{-1}(FAR)
 \]</span></p>
-<p>Where: ( HR ) is the hit rate (proportion of Go responses in the Go condition) and ( FAR ) is the false alarm rate (proportion of Go responses in the No-Go condition). <span class="math inline">\(\Phi^{-1}\)</span> represents the z-inverse of the cumulative distribution function of the standard normal distribution. It converts values between 0-1 to z-scores.</p>
-<p>We can also model d’ using a random intercept and slope regression probit regression model.</p>
+<p>Where <span class="math inline">\(\Phi^{-1}\)</span> represents the inverse cumulative distribution function of the standard normal distribution. It converts values between 0-1 to z-scores.</p>
+<p><strong>We can also model d’ using a random intercept and slope regression probit regression model.</strong> This approach will allow us to estimate uncertainty in each participant’s fitted d’ value, and calculate RMP internal consistency.</p>
+<p>We will contrast code condition so that <code>condition_contrast = -1/2</code> when “no-go”, and <code>condition_contrast = +1/2</code> for “go” trials.</p>
 <p>The random intercept captures individual’s propensity to generally respond “go” regardless of condition.</p>
 <p>The random slope captures how well individuals’ shift their probability of responding “go” between conditions.</p>
-<p>We will contrast code condition so that <code>condition_contrast = -1/2</code> when “no-go”, and <code>condition_contrast = +1/2</code> for “go” trials.</p>
-<p>This means that the beta coefficient for condition_contrast will correspond the change in the of responding “go” between conditions.</p>
+<p>The beta coefficient for condition_contrast will correspond the change in the of responding “go” between conditions.</p>
 </section>
 <section id="summarise-data" class="level2">
 <h2 class="anchored" data-anchor-id="summarise-data">Summarise data</h2>
@@ -840,63 +843,81 @@ d' = \Phi^{-1}(HR) - \Phi^{-1}(FAR)
 </div>
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">saveRDS</span>(data_long_summarised, <span class="at">file =</span> <span class="fu">file.path</span>(<span class="st">"data"</span>,<span class="st">"osf_hedge_cwzds"</span>,<span class="st">"data_long_summarised.Rds"</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<p>Instead of modelling each trial individually, we will sum the number of “go” responses in each condition to speed up model fitting.</p>
-<p>Because we are assuming that the probability of responding go just varies by condition and participant, we do not need the individual trial data.</p>
-<p>For example, if we wanted to estimate out the probability of a bent coin landing on head, we just need the number of heads and number of throws.</p>
-<p>We could instead model each individual trial and get the same results (albeit more slowly), particularly if we wanted to include trial-level predictors (e.g., reaction time).</p>
+<p>Instead of modelling each trial individually, we will sum the number of “go” responses in each condition for each participant. This should speed up model fitting.</p>
+<p>Because we are assuming that the probability of responding go only varies by condition and participant, we do not need the individual trial data.</p>
+<p>For example, if we wanted to estimate out the probability of a flipped bent coin landing on heads, we just need to know the number of heads and number of throws, not the value of each individual coin toss.</p>
+<p>One could model individual trials to include trial-level predictors, such as reaction time.</p>
 </section>
-<section id="fit-signal-detection-models-on-each-session-time-point" class="level2">
-<h2 class="anchored" data-anchor-id="fit-signal-detection-models-on-each-session-time-point">Fit signal detection models on each session (time point)</h2>
-<p>In the next code chunk, we fit our models to each session (time point) and extract two matrices of our posterior sensitivity draws.</p>
-<p>After fitting the models, we extract the posterior draws of each subject’s d’ value at each timepoint into two matrices called <code>subj_draws_time_1</code> and <code>subj_draws_time_2</code>.</p>
+<section id="fit-bayesian-signal-detection-theory-models" class="level2">
+<h2 class="anchored" data-anchor-id="fit-bayesian-signal-detection-theory-models">Fit Bayesian signal detection theory models</h2>
+<p>In the next code chunk, we fit our models to each session (time point) and we extract the posterior draws of each subject’s d’ value at each time point into two matrices called <code>subj_draws_time_1</code> and <code>subj_draws_time_2</code>.</p>
 <p>I will stick with brms’s default, vague priors on the model parameters.</p>
-<p>For calculating test-retest reliability, I think it is important that we fit the models at each time point independently. Otherwise, data from the second time point will be informing our estimates of <code>d'</code> at the first precise, so they will become more precise (essentially like adding additional trials).</p>
+<p>For calculating test-retest reliability, it makes sense to fit models at each time point independently. We do not want data from the second time point will be informing our estimates of <code>d'</code> at the first time point.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co"># https://osf.io/cwzds/</span></span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>model_time_1 <span class="ot">=</span> brms<span class="sc">::</span><span class="fu">brm</span>(</span>
 <span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>  n_go <span class="sc">|</span> <span class="fu">trials</span>(n) <span class="sc">~</span>  <span class="dv">1</span> <span class="sc">+</span> condition_contrast <span class="sc">+</span> (<span class="dv">1</span> <span class="sc">+</span> condition_contrast <span class="sc">|</span> pps),</span>
-<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>  <span class="co"># family = binomial(link = "probit"),</span></span>
-<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">family =</span> <span class="fu">binomial</span>(<span class="at">link =</span> <span class="st">"logit"</span>),</span>
-<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">data =</span> <span class="fu">filter</span>(data_long_summarised, session <span class="sc">==</span> <span class="dv">1</span> ),</span>
-<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">cores   =</span> <span class="dv">2</span>,</span>
-<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>  <span class="at">chains  =</span> <span class="dv">2</span>,</span>
-<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>  <span class="at">iter    =</span> <span class="dv">10000</span>,</span>
-<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a>  <span class="co"># init    = .01,</span></span>
-<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a>  <span class="at">adapt_delta =</span> .<span class="dv">95</span>,</span>
-<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a>  <span class="at">backend =</span> <span class="st">"cmdstanr"</span>,</span>
-<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a>  <span class="at">threads =</span> <span class="fu">threading</span>(<span class="dv">4</span>),</span>
-<span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a>  <span class="at">save_warmup =</span> <span class="cn">FALSE</span>,</span>
-<span id="cb6-16"><a href="#cb6-16" aria-hidden="true" tabindex="-1"></a>  <span class="at">refresh =</span> <span class="dv">500</span></span>
-<span id="cb6-17"><a href="#cb6-17" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb6-18"><a href="#cb6-18" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-19"><a href="#cb6-19" aria-hidden="true" tabindex="-1"></a>model_time_2 <span class="ot">=</span> brms<span class="sc">::</span><span class="fu">brm</span>(</span>
-<span id="cb6-20"><a href="#cb6-20" aria-hidden="true" tabindex="-1"></a>  n_go <span class="sc">|</span> <span class="fu">trials</span>(n) <span class="sc">~</span>  <span class="dv">1</span> <span class="sc">+</span> condition_contrast <span class="sc">+</span> (<span class="dv">1</span> <span class="sc">+</span> condition_contrast <span class="sc">|</span> pps),</span>
-<span id="cb6-21"><a href="#cb6-21" aria-hidden="true" tabindex="-1"></a>  <span class="co"># family = binomial(link = "probit"),</span></span>
-<span id="cb6-22"><a href="#cb6-22" aria-hidden="true" tabindex="-1"></a>  <span class="at">family =</span> <span class="fu">binomial</span>(<span class="at">link =</span> <span class="st">"logit"</span>),</span>
-<span id="cb6-23"><a href="#cb6-23" aria-hidden="true" tabindex="-1"></a>  <span class="at">data =</span> <span class="fu">filter</span>(data_long_summarised, session <span class="sc">==</span> <span class="dv">2</span> ),</span>
-<span id="cb6-24"><a href="#cb6-24" aria-hidden="true" tabindex="-1"></a>  <span class="at">cores   =</span> <span class="dv">2</span>,</span>
-<span id="cb6-25"><a href="#cb6-25" aria-hidden="true" tabindex="-1"></a>  <span class="at">chains  =</span> <span class="dv">2</span>,</span>
-<span id="cb6-26"><a href="#cb6-26" aria-hidden="true" tabindex="-1"></a>  <span class="at">iter    =</span> <span class="dv">10000</span>,</span>
-<span id="cb6-27"><a href="#cb6-27" aria-hidden="true" tabindex="-1"></a>  <span class="co"># init    = .01,</span></span>
-<span id="cb6-28"><a href="#cb6-28" aria-hidden="true" tabindex="-1"></a>  <span class="at">adapt_delta =</span> .<span class="dv">95</span>,</span>
-<span id="cb6-29"><a href="#cb6-29" aria-hidden="true" tabindex="-1"></a>  <span class="at">backend =</span> <span class="st">"cmdstanr"</span>,</span>
-<span id="cb6-30"><a href="#cb6-30" aria-hidden="true" tabindex="-1"></a>  <span class="at">threads =</span> <span class="fu">threading</span>(<span class="dv">4</span>),</span>
-<span id="cb6-31"><a href="#cb6-31" aria-hidden="true" tabindex="-1"></a>  <span class="at">save_warmup =</span> <span class="cn">FALSE</span>,</span>
-<span id="cb6-32"><a href="#cb6-32" aria-hidden="true" tabindex="-1"></a>  <span class="at">refresh =</span> <span class="dv">500</span>,</span>
-<span id="cb6-33"><a href="#cb6-33" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb6-34"><a href="#cb6-34" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">family =</span> <span class="fu">binomial</span>(<span class="at">link =</span> <span class="st">"probit"</span>),</span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">data =</span> <span class="fu">filter</span>(data_long_summarised, session <span class="sc">==</span> <span class="dv">1</span> ),</span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">cores   =</span> <span class="dv">2</span>,</span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">chains  =</span> <span class="dv">2</span>,</span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>  <span class="at">iter    =</span> <span class="dv">10000</span>,</span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>  <span class="co"># init    = .01,</span></span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a>  <span class="at">adapt_delta =</span> .<span class="dv">95</span>,</span>
+<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a>  <span class="at">backend =</span> <span class="st">"cmdstanr"</span>,</span>
+<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a>  <span class="at">threads =</span> <span class="fu">threading</span>(<span class="dv">4</span>),</span>
+<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a>  <span class="at">save_warmup =</span> <span class="cn">FALSE</span>,</span>
+<span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a>  <span class="at">refresh =</span> <span class="dv">500</span></span>
+<span id="cb6-16"><a href="#cb6-16" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb6-17"><a href="#cb6-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-18"><a href="#cb6-18" aria-hidden="true" tabindex="-1"></a>model_time_2 <span class="ot">=</span> brms<span class="sc">::</span><span class="fu">brm</span>(</span>
+<span id="cb6-19"><a href="#cb6-19" aria-hidden="true" tabindex="-1"></a>  n_go <span class="sc">|</span> <span class="fu">trials</span>(n) <span class="sc">~</span>  <span class="dv">1</span> <span class="sc">+</span> condition_contrast <span class="sc">+</span> (<span class="dv">1</span> <span class="sc">+</span> condition_contrast <span class="sc">|</span> pps),</span>
+<span id="cb6-20"><a href="#cb6-20" aria-hidden="true" tabindex="-1"></a>  <span class="at">family =</span> <span class="fu">binomial</span>(<span class="at">link =</span> <span class="st">"probit"</span>),</span>
+<span id="cb6-21"><a href="#cb6-21" aria-hidden="true" tabindex="-1"></a>  <span class="at">data =</span> <span class="fu">filter</span>(data_long_summarised, session <span class="sc">==</span> <span class="dv">2</span> ),</span>
+<span id="cb6-22"><a href="#cb6-22" aria-hidden="true" tabindex="-1"></a>  <span class="at">cores   =</span> <span class="dv">2</span>,</span>
+<span id="cb6-23"><a href="#cb6-23" aria-hidden="true" tabindex="-1"></a>  <span class="at">chains  =</span> <span class="dv">2</span>,</span>
+<span id="cb6-24"><a href="#cb6-24" aria-hidden="true" tabindex="-1"></a>  <span class="at">iter    =</span> <span class="dv">10000</span>,</span>
+<span id="cb6-25"><a href="#cb6-25" aria-hidden="true" tabindex="-1"></a>  <span class="co"># init    = .01,</span></span>
+<span id="cb6-26"><a href="#cb6-26" aria-hidden="true" tabindex="-1"></a>  <span class="at">adapt_delta =</span> .<span class="dv">95</span>,</span>
+<span id="cb6-27"><a href="#cb6-27" aria-hidden="true" tabindex="-1"></a>  <span class="at">backend =</span> <span class="st">"cmdstanr"</span>,</span>
+<span id="cb6-28"><a href="#cb6-28" aria-hidden="true" tabindex="-1"></a>  <span class="at">threads =</span> <span class="fu">threading</span>(<span class="dv">4</span>),</span>
+<span id="cb6-29"><a href="#cb6-29" aria-hidden="true" tabindex="-1"></a>  <span class="at">save_warmup =</span> <span class="cn">FALSE</span>,</span>
+<span id="cb6-30"><a href="#cb6-30" aria-hidden="true" tabindex="-1"></a>  <span class="at">refresh =</span> <span class="dv">500</span>,</span>
+<span id="cb6-31"><a href="#cb6-31" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb6-32"><a href="#cb6-32" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-33"><a href="#cb6-33" aria-hidden="true" tabindex="-1"></a><span class="co"># Time Session 1 </span></span>
+<span id="cb6-34"><a href="#cb6-34" aria-hidden="true" tabindex="-1"></a><span class="co"># Participant random effects of condition</span></span>
 <span id="cb6-35"><a href="#cb6-35" aria-hidden="true" tabindex="-1"></a>subj_draws_time_1 <span class="ot">=</span> <span class="fu">as_draws_df</span>(model_time_1) <span class="sc">%&gt;%</span></span>
 <span id="cb6-36"><a href="#cb6-36" aria-hidden="true" tabindex="-1"></a>                    <span class="fu">select</span>(<span class="fu">ends_with</span>(<span class="st">"condition_contrast]"</span>)) <span class="sc">%&gt;%</span></span>
-<span id="cb6-37"><a href="#cb6-37" aria-hidden="true" tabindex="-1"></a>                    <span class="fu">t</span>()</span>
+<span id="cb6-37"><a href="#cb6-37" aria-hidden="true" tabindex="-1"></a>                    <span class="fu">t</span>() </span>
 <span id="cb6-38"><a href="#cb6-38" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-39"><a href="#cb6-39" aria-hidden="true" tabindex="-1"></a>subj_draws_time_2 <span class="ot">=</span> <span class="fu">as_draws_df</span>(model_time_2) <span class="sc">%&gt;%</span></span>
-<span id="cb6-40"><a href="#cb6-40" aria-hidden="true" tabindex="-1"></a>                    <span class="fu">select</span>(<span class="fu">ends_with</span>(<span class="st">"condition_contrast]"</span>)) <span class="sc">%&gt;%</span></span>
-<span id="cb6-41"><a href="#cb6-41" aria-hidden="true" tabindex="-1"></a>                    <span class="fu">t</span>()</span>
-<span id="cb6-42"><a href="#cb6-42" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-39"><a href="#cb6-39" aria-hidden="true" tabindex="-1"></a><span class="co"># Main effect of condition</span></span>
+<span id="cb6-40"><a href="#cb6-40" aria-hidden="true" tabindex="-1"></a>cond_main_effect_1 <span class="ot">=</span> <span class="fu">as_draws_df</span>(model_time_1) <span class="sc">%&gt;%</span></span>
+<span id="cb6-41"><a href="#cb6-41" aria-hidden="true" tabindex="-1"></a>                     <span class="fu">pull</span>(b_condition_contrast) <span class="sc">%&gt;%</span> </span>
+<span id="cb6-42"><a href="#cb6-42" aria-hidden="true" tabindex="-1"></a>                     <span class="fu">as.numeric</span>()</span>
 <span id="cb6-43"><a href="#cb6-43" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-44"><a href="#cb6-44" aria-hidden="true" tabindex="-1"></a>subj_est_time_1 <span class="ot">=</span> <span class="fu">apply</span>(subj_draws_time_1, <span class="dv">1</span>, mean)</span>
-<span id="cb6-45"><a href="#cb6-45" aria-hidden="true" tabindex="-1"></a>subj_est_time_2 <span class="ot">=</span> <span class="fu">apply</span>(subj_draws_time_2, <span class="dv">1</span>, mean)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb6-44"><a href="#cb6-44" aria-hidden="true" tabindex="-1"></a><span class="co"># Add main effect of condition to random effects </span></span>
+<span id="cb6-45"><a href="#cb6-45" aria-hidden="true" tabindex="-1"></a>subj_draws_time_1 <span class="ot">=</span> subj_draws_time_1 <span class="sc">+</span> cond_main_effect_1</span>
+<span id="cb6-46"><a href="#cb6-46" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-47"><a href="#cb6-47" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-48"><a href="#cb6-48" aria-hidden="true" tabindex="-1"></a><span class="co"># Time / Session 2</span></span>
+<span id="cb6-49"><a href="#cb6-49" aria-hidden="true" tabindex="-1"></a><span class="co"># Participant random effects of condition</span></span>
+<span id="cb6-50"><a href="#cb6-50" aria-hidden="true" tabindex="-1"></a>subj_draws_time_2 <span class="ot">=</span> <span class="fu">as_draws_df</span>(model_time_2) <span class="sc">%&gt;%</span></span>
+<span id="cb6-51"><a href="#cb6-51" aria-hidden="true" tabindex="-1"></a>                    <span class="fu">select</span>(<span class="fu">ends_with</span>(<span class="st">"condition_contrast]"</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb6-52"><a href="#cb6-52" aria-hidden="true" tabindex="-1"></a>                    <span class="fu">t</span>() </span>
+<span id="cb6-53"><a href="#cb6-53" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-54"><a href="#cb6-54" aria-hidden="true" tabindex="-1"></a><span class="co"># Main effect of condition</span></span>
+<span id="cb6-55"><a href="#cb6-55" aria-hidden="true" tabindex="-1"></a>cond_main_effect_2 <span class="ot">=</span> <span class="fu">as_draws_df</span>(model_time_2) <span class="sc">%&gt;%</span></span>
+<span id="cb6-56"><a href="#cb6-56" aria-hidden="true" tabindex="-1"></a>                     <span class="fu">pull</span>(b_condition_contrast) <span class="sc">%&gt;%</span> </span>
+<span id="cb6-57"><a href="#cb6-57" aria-hidden="true" tabindex="-1"></a>                     <span class="fu">as.numeric</span>()</span>
+<span id="cb6-58"><a href="#cb6-58" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-59"><a href="#cb6-59" aria-hidden="true" tabindex="-1"></a><span class="co"># Add main effect of condition to random effects </span></span>
+<span id="cb6-60"><a href="#cb6-60" aria-hidden="true" tabindex="-1"></a>subj_draws_time_2 <span class="ot">=</span> subj_draws_time_2 <span class="sc">+</span> cond_main_effect_2</span>
+<span id="cb6-61"><a href="#cb6-61" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-62"><a href="#cb6-62" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-63"><a href="#cb6-63" aria-hidden="true" tabindex="-1"></a>subj_est_time_1 <span class="ot">=</span> <span class="fu">apply</span>(subj_draws_time_1, <span class="dv">1</span>, mean)</span>
+<span id="cb6-64"><a href="#cb6-64" aria-hidden="true" tabindex="-1"></a>subj_est_time_2 <span class="ot">=</span> <span class="fu">apply</span>(subj_draws_time_2, <span class="dv">1</span>, mean)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <section id="model-results" class="level3">
 <h3 class="anchored" data-anchor-id="model-results">Model results</h3>
@@ -904,7 +925,7 @@ d' = \Phi^{-1}(HR) - \Phi^{-1}(FAR)
 <div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>model_time_1</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code> Family: binomial 
-  Links: mu = logit 
+  Links: mu = probit 
 Formula: n_go | trials(n) ~ 1 + condition_contrast + (1 + condition_contrast | pps) 
    Data: filter(data_long_summarised, session == 1) (Number of observations: 214) 
   Draws: 2 chains, each with iter = 10000; warmup = 5000; thin = 1;
@@ -913,18 +934,18 @@ Formula: n_go | trials(n) ~ 1 + condition_contrast + (1 + condition_contrast | p
 Multilevel Hyperparameters:
 ~pps (Number of levels: 107) 
                                   Estimate Est.Error l-95% CI u-95% CI Rhat
-sd(Intercept)                         0.58      0.05     0.49     0.68 1.00
-sd(condition_contrast)                1.74      0.14     1.49     2.03 1.00
-cor(Intercept,condition_contrast)     0.46      0.09     0.27     0.63 1.00
+sd(Intercept)                         0.25      0.02     0.22     0.30 1.00
+sd(condition_contrast)                0.79      0.06     0.68     0.92 1.00
+cor(Intercept,condition_contrast)     0.14      0.11    -0.07     0.35 1.00
                                   Bulk_ESS Tail_ESS
-sd(Intercept)                         1868     3654
-sd(condition_contrast)                 842     1630
-cor(Intercept,condition_contrast)      639     1534
+sd(Intercept)                         2371     4908
+sd(condition_contrast)                1374     2706
+cor(Intercept,condition_contrast)      705     1863
 
 Regression Coefficients:
                    Estimate Est.Error l-95% CI u-95% CI Rhat Bulk_ESS Tail_ESS
-Intercept              1.76      0.07     1.63     1.89 1.00     1723     3198
-condition_contrast     6.57      0.19     6.22     6.94 1.00      793     1805
+Intercept              0.78      0.03     0.73     0.84 1.00     1699     3324
+condition_contrast     3.38      0.08     3.22     3.54 1.00      958     2056
 
 Draws were sampled using sample(hmc). For each parameter, Bulk_ESS
 and Tail_ESS are effective sample size measures, and Rhat is the potential
@@ -933,7 +954,7 @@ scale reduction factor on split chains (at convergence, Rhat = 1).</code></pre>
 <div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>model_time_2</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code> Family: binomial 
-  Links: mu = logit 
+  Links: mu = probit 
 Formula: n_go | trials(n) ~ 1 + condition_contrast + (1 + condition_contrast | pps) 
    Data: filter(data_long_summarised, session == 2) (Number of observations: 214) 
   Draws: 2 chains, each with iter = 10000; warmup = 5000; thin = 1;
@@ -942,56 +963,46 @@ Formula: n_go | trials(n) ~ 1 + condition_contrast + (1 + condition_contrast | p
 Multilevel Hyperparameters:
 ~pps (Number of levels: 107) 
                                   Estimate Est.Error l-95% CI u-95% CI Rhat
-sd(Intercept)                         0.61      0.05     0.51     0.71 1.00
-sd(condition_contrast)                2.15      0.16     1.86     2.48 1.00
-cor(Intercept,condition_contrast)     0.62      0.07     0.47     0.74 1.00
+sd(Intercept)                         0.26      0.02     0.22     0.31 1.00
+sd(condition_contrast)                1.00      0.07     0.87     1.16 1.00
+cor(Intercept,condition_contrast)     0.33      0.10     0.13     0.51 1.01
                                   Bulk_ESS Tail_ESS
-sd(Intercept)                         3182     5017
-sd(condition_contrast)                1572     3115
-cor(Intercept,condition_contrast)     1034     2052
+sd(Intercept)                         1495     3328
+sd(condition_contrast)                1012     1946
+cor(Intercept,condition_contrast)      398     1026
 
 Regression Coefficients:
                    Estimate Est.Error l-95% CI u-95% CI Rhat Bulk_ESS Tail_ESS
-Intercept              1.73      0.07     1.60     1.87 1.00     2421     4520
-condition_contrast     6.10      0.22     5.67     6.55 1.00     1779     3487
+Intercept              0.78      0.03     0.73     0.84 1.00     1346     2937
+condition_contrast     3.13      0.10     2.94     3.33 1.01      495      916
 
 Draws were sampled using sample(hmc). For each parameter, Bulk_ESS
 and Tail_ESS are effective sample size measures, and Rhat is the potential
 scale reduction factor on split chains (at convergence, Rhat = 1).</code></pre>
 </div>
 </div>
-<p>Let’s look at the the matrices of our posterior draws in detail. Below we show data from 4 posterior draws from the first 10 participants.</p>
-<p>At each session we have a matrix of 107 rows (one row for each subject) and 10,000 columns for each posterior of each subject’s posterior.</p>
-<p>Each row represents the posterior distribution for one participant’s <code>d'</code> value.</p>
-<p>If we just want point estimates of d’ for each participants, we could just take the mean value of each row (e.g., <code>apply(subj_draws_time_1, 1, mean)</code>)</p>
+<p>Let’s look at the the matrices <code>subj_draws_time_1</code> and <code>subj_draws_time_2</code> of our posterior draws in detail.</p>
+<p>Below we show data from 4 posterior draws from the first 10 participants.</p>
+<p>For each session we have a matrix of 107 rows (one row for each subject) and 10,000 columns, where each row has 10,000 posterior draws of a subject’s true d’ value.</p>
+<p>Since the random effects are centered, I have added the posterior distribution of the main effect of <code>condition_contrast</code> to the random effects to these posteriors back on the right scale.</p>
+<p>If we just want point estimates of d’ for each participants, we could just take the mean value of each row of this matrix (e.g., <code>apply(subj_draws_time_1, 1, mean)</code>)</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>subj_draws_time_1 <span class="sc">%&gt;%</span></span>
 <span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">data.frame</span>() <span class="sc">%&gt;%</span></span>
 <span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">slice</span>(<span class="dv">1</span><span class="sc">:</span><span class="dv">10</span>) <span class="sc">%&gt;%</span></span>
 <span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="dv">1</span><span class="sc">:</span><span class="dv">5</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>                                     X1        X2        X3         X4
-r_pps[1,condition_contrast]  -1.3318700  0.544681 -0.988008 -0.5249040
-r_pps[2,condition_contrast]  -0.2028200  0.756850  1.384640 -0.9038860
-r_pps[3,condition_contrast]  -0.0410552  1.215260  2.342850 -0.6930420
-r_pps[4,condition_contrast]   1.8254900  3.880690  4.465690  2.7590800
-r_pps[5,condition_contrast]  -1.1116300 -0.494705 -0.893132 -0.9750350
-r_pps[7,condition_contrast]  -0.7311390 -0.940774 -0.141872 -1.2588400
-r_pps[8,condition_contrast]   2.0245000  0.315528  1.376240  0.2179550
-r_pps[9,condition_contrast]   1.1972200  0.262254  0.880477  1.2379400
-r_pps[10,condition_contrast] -0.5006820 -0.430206 -0.847761 -0.0569135
-r_pps[11,condition_contrast]  3.0872300  1.935590  3.417510  1.4342000
-                                    X5
-r_pps[1,condition_contrast]  -0.769642
-r_pps[2,condition_contrast]   1.229490
-r_pps[3,condition_contrast]   1.902320
-r_pps[4,condition_contrast]   2.972450
-r_pps[5,condition_contrast]  -0.936735
-r_pps[7,condition_contrast]  -0.245828
-r_pps[8,condition_contrast]   1.109380
-r_pps[9,condition_contrast]   0.148536
-r_pps[10,condition_contrast] -0.205071
-r_pps[11,condition_contrast]  3.601960</code></pre>
+<pre><code>                                   X1       X2       X3       X4       X5
+r_pps[1,condition_contrast]  2.678295 3.191256 2.748715 3.679088 2.853240
+r_pps[2,condition_contrast]  3.320670 3.173432 3.452445 3.845853 3.431283
+r_pps[3,condition_contrast]  3.526739 3.329743 3.626290 3.881893 3.530939
+r_pps[4,condition_contrast]  4.759060 4.807680 5.021130 4.684030 5.113570
+r_pps[5,condition_contrast]  3.065203 2.989125 3.064199 3.350858 3.027026
+r_pps[7,condition_contrast]  3.337199 2.844011 3.514729 3.063312 3.324809
+r_pps[8,condition_contrast]  3.525429 4.106357 3.821453 3.917202 4.091214
+r_pps[9,condition_contrast]  3.459289 3.822319 3.504680 4.228473 3.675441
+r_pps[10,condition_contrast] 3.222277 3.397768 3.708416 3.159492 3.694361
+r_pps[11,condition_contrast] 4.674070 4.316090 4.579070 5.195560 4.069727</code></pre>
 </div>
 <div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="fu">nrow</span>(subj_draws_time_1)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
@@ -1038,7 +1049,8 @@ r_pps[11,condition_contrast]  3.601960</code></pre>
 <span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a><span class="co">#   geom_density(alpha = .2) +</span></span>
 <span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a><span class="co">#   facet_wrap(~pps)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<p>Note that when estimating random intercepts or slopes, these coefficients represents deviations from the population mean. To calculate each participant’s actual <code>d</code> value, we would add the value of the fixed effect for condition_contrast to each posterior draw (~ 0.12).</p>
+<p>Just from eye-balling the posteriors, we can see that there is a lot of variability between participants, and our estimates look quite precise.</p>
+<p>As expected, most of the mass of each density lies above 0. If d’ is less than zero it would indicate that a participant is more likely to press the space bar (i.e., “go”) for no-go conditions than go conditions, which would be odd.</p>
 </section>
 </section>
 </section>
@@ -1083,322 +1095,92 @@ r_pps[11,condition_contrast]  3.601960</code></pre>
 <pre><code>[1] "Number of subjects: 107"
 [1] "Number of posterior draws: 10000"</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="fu">hist</span>(rmp_time1<span class="sc">$</span>rmp_posterior, <span class="at">breaks =</span> <span class="dv">100</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output-display">
-<div>
-<figure class="figure">
-<p><img src="index_files/figure-html/unnamed-chunk-9-1.png" class="img-fluid figure-img" width="672"></p>
-</figure>
+<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a>rmp_time1<span class="sc">$</span>hdci</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>          y    ymin      ymax .width .point .interval
+1 0.8934711 0.86158 0.9230055   0.95   mean      hdci</code></pre>
 </div>
-</div>
-<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="fu">hist</span>(rmp_time2<span class="sc">$</span>rmp_posterior, <span class="at">breaks =</span> <span class="dv">100</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output-display">
-<div>
-<figure class="figure">
-<p><img src="index_files/figure-html/unnamed-chunk-9-2.png" class="img-fluid figure-img" width="672"></p>
-</figure>
-</div>
-</div>
-<div class="sourceCode cell-code" id="cb27"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a>predicted_test_retest <span class="ot">=</span> <span class="fu">sqrt</span>(rmp_time1<span class="sc">$</span>rmp_posterior<span class="sc">*</span>rmp_time2<span class="sc">$</span>rmp_posterior)</span>
-<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb27-3"><a href="#cb27-3" aria-hidden="true" tabindex="-1"></a>ggdist<span class="sc">::</span><span class="fu">mean_hdci</span>(predicted_test_retest, <span class="at">.width =</span> <span class="fl">0.95</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb27"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a>rmp_time2<span class="sc">$</span>hdci</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>          y      ymin      ymax .width .point .interval
-1 0.8926917 0.8685715 0.9159527   0.95   mean      hdci</code></pre>
+1 0.9317492 0.9105242 0.9514779   0.95   mean      hdci</code></pre>
 </div>
+<div class="sourceCode cell-code" id="cb29"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a><span class="co"># hist(rmp_time1$rmp_posterior, breaks = 100)</span></span>
+<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a><span class="co"># hist(rmp_time2$rmp_posterior, breaks = 100)</span></span>
+<span id="cb29-3"><a href="#cb29-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb29-4"><a href="#cb29-4" aria-hidden="true" tabindex="-1"></a>predicted_test_retest <span class="ot">=</span> <span class="fu">sqrt</span>(rmp_time1<span class="sc">$</span>rmp_posterior<span class="sc">*</span>rmp_time2<span class="sc">$</span>rmp_posterior)</span>
+<span id="cb29-5"><a href="#cb29-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb29-6"><a href="#cb29-6" aria-hidden="true" tabindex="-1"></a><span class="co"># ggdist::mean_hdci(predicted_test_retest, .width = 0.95)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>Relative measurement precision indicates that reliability at the first time point was 87% (95% Credible Interval = 83%-91%), and at the second time point reliability was 91% (95% CI[89%, 94%]).</p>
 <p>The test-retest reliability is a little lower than these estimates (r = .70), as we might expect:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb29"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cor.test</span>(subj_est_time_1, subj_est_time_2)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb30"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cor.test</span>(subj_est_time_1, subj_est_time_2)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>
     Pearson's product-moment correlation
 
 data:  subj_est_time_1 and subj_est_time_2
-t = 10.147, df = 105, p-value &lt; 2.2e-16
+t = 10.872, df = 105, p-value &lt; 2.2e-16
 alternative hypothesis: true correlation is not equal to 0
 95 percent confidence interval:
- 0.5929996 0.7881998
+ 0.6240919 0.8061942
 sample estimates:
-      cor 
-0.7036383 </code></pre>
+     cor 
+0.727723 </code></pre>
 </div>
 </div>
 <p>If there were no changes in individuals latent (true) <code>d'</code> values across the conditions, we would expect the test-rest reliability to correspond to the internal consistency measures. Because change in inevitable, the test-retest reliability should usually be a bit lower than internal consistency.</p>
 <p>Below we compare our posterior distributions for test-retest reliability to the internal consistency estimates at each time point.</p>
 <p>First, we calculate a posterior distribution for the test-retest reliability:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb31"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a><span class="co"># With thanks to https://solomonkurz.netlify.app/blog/2019-02-16-bayesian-correlations-let-s-talk-options/</span></span>
-<span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a>test_retest_cor <span class="ot">=</span> <span class="fu">data.frame</span>(subj_est_time_1, subj_est_time_2) <span class="sc">%&gt;%</span></span>
-<span id="cb31-3"><a href="#cb31-3" aria-hidden="true" tabindex="-1"></a>  <span class="co"># scale() %&gt;%</span></span>
-<span id="cb31-4"><a href="#cb31-4" aria-hidden="true" tabindex="-1"></a>  brms<span class="sc">::</span><span class="fu">brm</span>(</span>
-<span id="cb31-5"><a href="#cb31-5" aria-hidden="true" tabindex="-1"></a>       <span class="co"># bf(mvbind(subj_est_time_2,subj_est_time_1 ) ~ 1) + set_rescor(TRUE),</span></span>
-<span id="cb31-6"><a href="#cb31-6" aria-hidden="true" tabindex="-1"></a>       <span class="fu">bf</span>(<span class="fu">mvbind</span>(subj_est_time_2,subj_est_time_1 ) <span class="sc">~</span> <span class="dv">1</span>,</span>
-<span id="cb31-7"><a href="#cb31-7" aria-hidden="true" tabindex="-1"></a>         sigma <span class="sc">~</span> <span class="dv">1</span>) <span class="sc">+</span> <span class="fu">set_rescor</span>(<span class="cn">TRUE</span>),</span>
-<span id="cb31-8"><a href="#cb31-8" aria-hidden="true" tabindex="-1"></a>       <span class="at">data =</span> .,</span>
-<span id="cb31-9"><a href="#cb31-9" aria-hidden="true" tabindex="-1"></a>       <span class="at">chains =</span> <span class="dv">2</span>,</span>
-<span id="cb31-10"><a href="#cb31-10" aria-hidden="true" tabindex="-1"></a>       <span class="at">cores =</span> <span class="dv">2</span>,</span>
-<span id="cb31-11"><a href="#cb31-11" aria-hidden="true" tabindex="-1"></a>       <span class="at">iter =</span> <span class="dv">10000</span>,</span>
-<span id="cb31-12"><a href="#cb31-12" aria-hidden="true" tabindex="-1"></a>       <span class="at">backend =</span> <span class="st">"cmdstanr"</span>,</span>
-<span id="cb31-13"><a href="#cb31-13" aria-hidden="true" tabindex="-1"></a>       <span class="at">threads =</span> <span class="fu">threading</span>(<span class="dv">4</span>)</span>
-<span id="cb31-14"><a href="#cb31-14" aria-hidden="true" tabindex="-1"></a>       )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>Running MCMC with 2 parallel chains, with 4 thread(s) per chain...
-
-Chain 1 Iteration:    1 / 10000 [  0%]  (Warmup) 
-Chain 1 Iteration:  100 / 10000 [  1%]  (Warmup) 
-Chain 2 Iteration:    1 / 10000 [  0%]  (Warmup) 
-Chain 2 Iteration:  100 / 10000 [  1%]  (Warmup) 
-Chain 1 Iteration:  200 / 10000 [  2%]  (Warmup) 
-Chain 2 Iteration:  200 / 10000 [  2%]  (Warmup) 
-Chain 1 Iteration:  300 / 10000 [  3%]  (Warmup) 
-Chain 1 Iteration:  400 / 10000 [  4%]  (Warmup) 
-Chain 2 Iteration:  300 / 10000 [  3%]  (Warmup) 
-Chain 2 Iteration:  400 / 10000 [  4%]  (Warmup) 
-Chain 1 Iteration:  500 / 10000 [  5%]  (Warmup) 
-Chain 2 Iteration:  500 / 10000 [  5%]  (Warmup) 
-Chain 1 Iteration:  600 / 10000 [  6%]  (Warmup) 
-Chain 1 Iteration:  700 / 10000 [  7%]  (Warmup) 
-Chain 2 Iteration:  600 / 10000 [  6%]  (Warmup) 
-Chain 2 Iteration:  700 / 10000 [  7%]  (Warmup) 
-Chain 1 Iteration:  800 / 10000 [  8%]  (Warmup) 
-Chain 1 Iteration:  900 / 10000 [  9%]  (Warmup) 
-Chain 2 Iteration:  800 / 10000 [  8%]  (Warmup) 
-Chain 2 Iteration:  900 / 10000 [  9%]  (Warmup) 
-Chain 1 Iteration: 1000 / 10000 [ 10%]  (Warmup) 
-Chain 1 Iteration: 1100 / 10000 [ 11%]  (Warmup) 
-Chain 2 Iteration: 1000 / 10000 [ 10%]  (Warmup) 
-Chain 2 Iteration: 1100 / 10000 [ 11%]  (Warmup) 
-Chain 1 Iteration: 1200 / 10000 [ 12%]  (Warmup) 
-Chain 1 Iteration: 1300 / 10000 [ 13%]  (Warmup) 
-Chain 2 Iteration: 1200 / 10000 [ 12%]  (Warmup) 
-Chain 2 Iteration: 1300 / 10000 [ 13%]  (Warmup) 
-Chain 1 Iteration: 1400 / 10000 [ 14%]  (Warmup) 
-Chain 1 Iteration: 1500 / 10000 [ 15%]  (Warmup) 
-Chain 2 Iteration: 1400 / 10000 [ 14%]  (Warmup) 
-Chain 2 Iteration: 1500 / 10000 [ 15%]  (Warmup) 
-Chain 1 Iteration: 1600 / 10000 [ 16%]  (Warmup) 
-Chain 2 Iteration: 1600 / 10000 [ 16%]  (Warmup) 
-Chain 1 Iteration: 1700 / 10000 [ 17%]  (Warmup) 
-Chain 1 Iteration: 1800 / 10000 [ 18%]  (Warmup) 
-Chain 2 Iteration: 1700 / 10000 [ 17%]  (Warmup) 
-Chain 2 Iteration: 1800 / 10000 [ 18%]  (Warmup) 
-Chain 1 Iteration: 1900 / 10000 [ 19%]  (Warmup) 
-Chain 1 Iteration: 2000 / 10000 [ 20%]  (Warmup) 
-Chain 2 Iteration: 1900 / 10000 [ 19%]  (Warmup) 
-Chain 2 Iteration: 2000 / 10000 [ 20%]  (Warmup) 
-Chain 1 Iteration: 2100 / 10000 [ 21%]  (Warmup) 
-Chain 1 Iteration: 2200 / 10000 [ 22%]  (Warmup) 
-Chain 2 Iteration: 2100 / 10000 [ 21%]  (Warmup) 
-Chain 2 Iteration: 2200 / 10000 [ 22%]  (Warmup) 
-Chain 1 Iteration: 2300 / 10000 [ 23%]  (Warmup) 
-Chain 1 Iteration: 2400 / 10000 [ 24%]  (Warmup) 
-Chain 2 Iteration: 2300 / 10000 [ 23%]  (Warmup) 
-Chain 2 Iteration: 2400 / 10000 [ 24%]  (Warmup) 
-Chain 1 Iteration: 2500 / 10000 [ 25%]  (Warmup) 
-Chain 1 Iteration: 2600 / 10000 [ 26%]  (Warmup) 
-Chain 2 Iteration: 2500 / 10000 [ 25%]  (Warmup) 
-Chain 2 Iteration: 2600 / 10000 [ 26%]  (Warmup) 
-Chain 1 Iteration: 2700 / 10000 [ 27%]  (Warmup) 
-Chain 1 Iteration: 2800 / 10000 [ 28%]  (Warmup) 
-Chain 2 Iteration: 2700 / 10000 [ 27%]  (Warmup) 
-Chain 2 Iteration: 2800 / 10000 [ 28%]  (Warmup) 
-Chain 1 Iteration: 2900 / 10000 [ 29%]  (Warmup) 
-Chain 1 Iteration: 3000 / 10000 [ 30%]  (Warmup) 
-Chain 2 Iteration: 2900 / 10000 [ 29%]  (Warmup) 
-Chain 2 Iteration: 3000 / 10000 [ 30%]  (Warmup) 
-Chain 1 Iteration: 3100 / 10000 [ 31%]  (Warmup) 
-Chain 1 Iteration: 3200 / 10000 [ 32%]  (Warmup) 
-Chain 2 Iteration: 3100 / 10000 [ 31%]  (Warmup) 
-Chain 2 Iteration: 3200 / 10000 [ 32%]  (Warmup) 
-Chain 2 Iteration: 3300 / 10000 [ 33%]  (Warmup) 
-Chain 1 Iteration: 3300 / 10000 [ 33%]  (Warmup) 
-Chain 1 Iteration: 3400 / 10000 [ 34%]  (Warmup) 
-Chain 2 Iteration: 3400 / 10000 [ 34%]  (Warmup) 
-Chain 2 Iteration: 3500 / 10000 [ 35%]  (Warmup) 
-Chain 1 Iteration: 3500 / 10000 [ 35%]  (Warmup) 
-Chain 1 Iteration: 3600 / 10000 [ 36%]  (Warmup) 
-Chain 2 Iteration: 3600 / 10000 [ 36%]  (Warmup) 
-Chain 2 Iteration: 3700 / 10000 [ 37%]  (Warmup) 
-Chain 1 Iteration: 3700 / 10000 [ 37%]  (Warmup) 
-Chain 1 Iteration: 3800 / 10000 [ 38%]  (Warmup) 
-Chain 2 Iteration: 3800 / 10000 [ 38%]  (Warmup) 
-Chain 2 Iteration: 3900 / 10000 [ 39%]  (Warmup) 
-Chain 1 Iteration: 3900 / 10000 [ 39%]  (Warmup) 
-Chain 1 Iteration: 4000 / 10000 [ 40%]  (Warmup) 
-Chain 2 Iteration: 4000 / 10000 [ 40%]  (Warmup) 
-Chain 2 Iteration: 4100 / 10000 [ 41%]  (Warmup) 
-Chain 1 Iteration: 4100 / 10000 [ 41%]  (Warmup) 
-Chain 1 Iteration: 4200 / 10000 [ 42%]  (Warmup) 
-Chain 2 Iteration: 4200 / 10000 [ 42%]  (Warmup) 
-Chain 2 Iteration: 4300 / 10000 [ 43%]  (Warmup) 
-Chain 1 Iteration: 4300 / 10000 [ 43%]  (Warmup) 
-Chain 1 Iteration: 4400 / 10000 [ 44%]  (Warmup) 
-Chain 2 Iteration: 4400 / 10000 [ 44%]  (Warmup) 
-Chain 2 Iteration: 4500 / 10000 [ 45%]  (Warmup) 
-Chain 1 Iteration: 4500 / 10000 [ 45%]  (Warmup) 
-Chain 1 Iteration: 4600 / 10000 [ 46%]  (Warmup) 
-Chain 2 Iteration: 4600 / 10000 [ 46%]  (Warmup) 
-Chain 2 Iteration: 4700 / 10000 [ 47%]  (Warmup) 
-Chain 1 Iteration: 4700 / 10000 [ 47%]  (Warmup) 
-Chain 2 Iteration: 4800 / 10000 [ 48%]  (Warmup) 
-Chain 2 Iteration: 4900 / 10000 [ 49%]  (Warmup) 
-Chain 1 Iteration: 4800 / 10000 [ 48%]  (Warmup) 
-Chain 1 Iteration: 4900 / 10000 [ 49%]  (Warmup) 
-Chain 2 Iteration: 5000 / 10000 [ 50%]  (Warmup) 
-Chain 2 Iteration: 5001 / 10000 [ 50%]  (Sampling) 
-Chain 1 Iteration: 5000 / 10000 [ 50%]  (Warmup) 
-Chain 1 Iteration: 5001 / 10000 [ 50%]  (Sampling) 
-Chain 2 Iteration: 5100 / 10000 [ 51%]  (Sampling) 
-Chain 1 Iteration: 5100 / 10000 [ 51%]  (Sampling) 
-Chain 1 Iteration: 5200 / 10000 [ 52%]  (Sampling) 
-Chain 2 Iteration: 5200 / 10000 [ 52%]  (Sampling) 
-Chain 1 Iteration: 5300 / 10000 [ 53%]  (Sampling) 
-Chain 2 Iteration: 5300 / 10000 [ 53%]  (Sampling) 
-Chain 2 Iteration: 5400 / 10000 [ 54%]  (Sampling) 
-Chain 1 Iteration: 5400 / 10000 [ 54%]  (Sampling) 
-Chain 1 Iteration: 5500 / 10000 [ 55%]  (Sampling) 
-Chain 2 Iteration: 5500 / 10000 [ 55%]  (Sampling) 
-Chain 1 Iteration: 5600 / 10000 [ 56%]  (Sampling) 
-Chain 2 Iteration: 5600 / 10000 [ 56%]  (Sampling) 
-Chain 2 Iteration: 5700 / 10000 [ 57%]  (Sampling) 
-Chain 1 Iteration: 5700 / 10000 [ 57%]  (Sampling) 
-Chain 2 Iteration: 5800 / 10000 [ 58%]  (Sampling) 
-Chain 1 Iteration: 5800 / 10000 [ 58%]  (Sampling) 
-Chain 1 Iteration: 5900 / 10000 [ 59%]  (Sampling) 
-Chain 2 Iteration: 5900 / 10000 [ 59%]  (Sampling) 
-Chain 1 Iteration: 6000 / 10000 [ 60%]  (Sampling) 
-Chain 2 Iteration: 6000 / 10000 [ 60%]  (Sampling) 
-Chain 2 Iteration: 6100 / 10000 [ 61%]  (Sampling) 
-Chain 1 Iteration: 6100 / 10000 [ 61%]  (Sampling) 
-Chain 1 Iteration: 6200 / 10000 [ 62%]  (Sampling) 
-Chain 2 Iteration: 6200 / 10000 [ 62%]  (Sampling) 
-Chain 2 Iteration: 6300 / 10000 [ 63%]  (Sampling) 
-Chain 1 Iteration: 6300 / 10000 [ 63%]  (Sampling) 
-Chain 2 Iteration: 6400 / 10000 [ 64%]  (Sampling) 
-Chain 1 Iteration: 6400 / 10000 [ 64%]  (Sampling) 
-Chain 1 Iteration: 6500 / 10000 [ 65%]  (Sampling) 
-Chain 2 Iteration: 6500 / 10000 [ 65%]  (Sampling) 
-Chain 2 Iteration: 6600 / 10000 [ 66%]  (Sampling) 
-Chain 1 Iteration: 6600 / 10000 [ 66%]  (Sampling) 
-Chain 1 Iteration: 6700 / 10000 [ 67%]  (Sampling) 
-Chain 2 Iteration: 6700 / 10000 [ 67%]  (Sampling) 
-Chain 1 Iteration: 6800 / 10000 [ 68%]  (Sampling) 
-Chain 2 Iteration: 6800 / 10000 [ 68%]  (Sampling) 
-Chain 2 Iteration: 6900 / 10000 [ 69%]  (Sampling) 
-Chain 1 Iteration: 6900 / 10000 [ 69%]  (Sampling) 
-Chain 1 Iteration: 7000 / 10000 [ 70%]  (Sampling) 
-Chain 2 Iteration: 7000 / 10000 [ 70%]  (Sampling) 
-Chain 1 Iteration: 7100 / 10000 [ 71%]  (Sampling) 
-Chain 2 Iteration: 7100 / 10000 [ 71%]  (Sampling) 
-Chain 2 Iteration: 7200 / 10000 [ 72%]  (Sampling) 
-Chain 1 Iteration: 7200 / 10000 [ 72%]  (Sampling) 
-Chain 1 Iteration: 7300 / 10000 [ 73%]  (Sampling) 
-Chain 2 Iteration: 7300 / 10000 [ 73%]  (Sampling) 
-Chain 1 Iteration: 7400 / 10000 [ 74%]  (Sampling) 
-Chain 1 Iteration: 7500 / 10000 [ 75%]  (Sampling) 
-Chain 2 Iteration: 7400 / 10000 [ 74%]  (Sampling) 
-Chain 2 Iteration: 7500 / 10000 [ 75%]  (Sampling) 
-Chain 1 Iteration: 7600 / 10000 [ 76%]  (Sampling) 
-Chain 2 Iteration: 7600 / 10000 [ 76%]  (Sampling) 
-Chain 1 Iteration: 7700 / 10000 [ 77%]  (Sampling) 
-Chain 1 Iteration: 7800 / 10000 [ 78%]  (Sampling) 
-Chain 2 Iteration: 7700 / 10000 [ 77%]  (Sampling) 
-Chain 2 Iteration: 7800 / 10000 [ 78%]  (Sampling) 
-Chain 1 Iteration: 7900 / 10000 [ 79%]  (Sampling) 
-Chain 1 Iteration: 8000 / 10000 [ 80%]  (Sampling) 
-Chain 2 Iteration: 7900 / 10000 [ 79%]  (Sampling) 
-Chain 2 Iteration: 8000 / 10000 [ 80%]  (Sampling) 
-Chain 1 Iteration: 8100 / 10000 [ 81%]  (Sampling) 
-Chain 2 Iteration: 8100 / 10000 [ 81%]  (Sampling) 
-Chain 1 Iteration: 8200 / 10000 [ 82%]  (Sampling) 
-Chain 1 Iteration: 8300 / 10000 [ 83%]  (Sampling) 
-Chain 2 Iteration: 8200 / 10000 [ 82%]  (Sampling) 
-Chain 2 Iteration: 8300 / 10000 [ 83%]  (Sampling) 
-Chain 1 Iteration: 8400 / 10000 [ 84%]  (Sampling) 
-Chain 1 Iteration: 8500 / 10000 [ 85%]  (Sampling) 
-Chain 2 Iteration: 8400 / 10000 [ 84%]  (Sampling) 
-Chain 1 Iteration: 8600 / 10000 [ 86%]  (Sampling) 
-Chain 2 Iteration: 8500 / 10000 [ 85%]  (Sampling) 
-Chain 2 Iteration: 8600 / 10000 [ 86%]  (Sampling) 
-Chain 1 Iteration: 8700 / 10000 [ 87%]  (Sampling) 
-Chain 1 Iteration: 8800 / 10000 [ 88%]  (Sampling) 
-Chain 2 Iteration: 8700 / 10000 [ 87%]  (Sampling) 
-Chain 1 Iteration: 8900 / 10000 [ 89%]  (Sampling) 
-Chain 2 Iteration: 8800 / 10000 [ 88%]  (Sampling) 
-Chain 2 Iteration: 8900 / 10000 [ 89%]  (Sampling) 
-Chain 1 Iteration: 9000 / 10000 [ 90%]  (Sampling) 
-Chain 1 Iteration: 9100 / 10000 [ 91%]  (Sampling) 
-Chain 2 Iteration: 9000 / 10000 [ 90%]  (Sampling) 
-Chain 2 Iteration: 9100 / 10000 [ 91%]  (Sampling) 
-Chain 1 Iteration: 9200 / 10000 [ 92%]  (Sampling) 
-Chain 2 Iteration: 9200 / 10000 [ 92%]  (Sampling) 
-Chain 1 Iteration: 9300 / 10000 [ 93%]  (Sampling) 
-Chain 1 Iteration: 9400 / 10000 [ 94%]  (Sampling) 
-Chain 2 Iteration: 9300 / 10000 [ 93%]  (Sampling) 
-Chain 2 Iteration: 9400 / 10000 [ 94%]  (Sampling) 
-Chain 1 Iteration: 9500 / 10000 [ 95%]  (Sampling) 
-Chain 1 Iteration: 9600 / 10000 [ 96%]  (Sampling) 
-Chain 2 Iteration: 9500 / 10000 [ 95%]  (Sampling) 
-Chain 1 Iteration: 9700 / 10000 [ 97%]  (Sampling) 
-Chain 2 Iteration: 9600 / 10000 [ 96%]  (Sampling) 
-Chain 2 Iteration: 9700 / 10000 [ 97%]  (Sampling) 
-Chain 1 Iteration: 9800 / 10000 [ 98%]  (Sampling) 
-Chain 1 Iteration: 9900 / 10000 [ 99%]  (Sampling) 
-Chain 2 Iteration: 9800 / 10000 [ 98%]  (Sampling) 
-Chain 1 Iteration: 10000 / 10000 [100%]  (Sampling) 
-Chain 2 Iteration: 9900 / 10000 [ 99%]  (Sampling) 
-Chain 2 Iteration: 10000 / 10000 [100%]  (Sampling) 
-Chain 1 finished in 6.0 seconds.
-Chain 2 finished in 6.0 seconds.
-
-Both chains finished successfully.
-Mean chain execution time: 6.0 seconds.
-Total execution time: 6.1 seconds.</code></pre>
-</div>
-<div class="sourceCode cell-code" id="cb33"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a>tidybayes<span class="sc">::</span><span class="fu">get_variables</span>(test_retest_cor)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code> [1] "b_subjesttime2_Intercept"           "b_sigma_subjesttime2_Intercept"    
- [3] "b_subjesttime1_Intercept"           "b_sigma_subjesttime1_Intercept"    
- [5] "Intercept_subjesttime2"             "Intercept_sigma_subjesttime2"      
- [7] "Intercept_subjesttime1"             "Intercept_sigma_subjesttime1"      
- [9] "rescor__subjesttime2__subjesttime1" "lprior"                            
-[11] "lp__"                               "accept_stat__"                     
-[13] "treedepth__"                        "stepsize__"                        
-[15] "divergent__"                        "n_leapfrog__"                      
-[17] "energy__"                          </code></pre>
-</div>
-<div class="sourceCode cell-code" id="cb35"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a>test_retest_cor_posterior <span class="ot">=</span> test_retest_cor <span class="sc">%&gt;%</span></span>
-<span id="cb35-2"><a href="#cb35-2" aria-hidden="true" tabindex="-1"></a>  tidybayes<span class="sc">::</span><span class="fu">spread_draws</span>(rescor__subjesttime2__subjesttime1)</span>
-<span id="cb35-3"><a href="#cb35-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb35-4"><a href="#cb35-4" aria-hidden="true" tabindex="-1"></a><span class="co"># I'm not sure if drawing from the predictive distribtions of both things makes sense here</span></span>
-<span id="cb35-5"><a href="#cb35-5" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> (<span class="cn">FALSE</span>){</span>
-<span id="cb35-6"><a href="#cb35-6" aria-hidden="true" tabindex="-1"></a>  subj_draws_time_1 <span class="ot">=</span> subj_draws_time_1[,<span class="fu">sample</span>(<span class="fu">ncol</span>(subj_draws_time_1), <span class="at">replace =</span> <span class="cn">FALSE</span>)]</span>
-<span id="cb35-7"><a href="#cb35-7" aria-hidden="true" tabindex="-1"></a>  subj_draws_time_2 <span class="ot">=</span> subj_draws_time_2[,<span class="fu">sample</span>(<span class="fu">ncol</span>(subj_draws_time_2), <span class="at">replace =</span> <span class="cn">FALSE</span>)]</span>
-<span id="cb35-8"><a href="#cb35-8" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb35-9"><a href="#cb35-9" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb35-10"><a href="#cb35-10" aria-hidden="true" tabindex="-1"></a>  test_retest_posterior <span class="ot">=</span> <span class="fu">sapply</span>(<span class="dv">1</span><span class="sc">:</span><span class="fu">ncol</span>(subj_draws_time_1), <span class="cf">function</span>(i)</span>
-<span id="cb35-11"><a href="#cb35-11" aria-hidden="true" tabindex="-1"></a>    <span class="fu">cor</span>(subj_draws_time_1[,i], subj_draws_time_2[,i])</span>
-<span id="cb35-12"><a href="#cb35-12" aria-hidden="true" tabindex="-1"></a>    )</span>
-<span id="cb35-13"><a href="#cb35-13" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb35-14"><a href="#cb35-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mean</span>(test_retest_posterior)</span>
-<span id="cb35-15"><a href="#cb35-15" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb35-16"><a href="#cb35-16" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb32"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a><span class="co"># With thanks to https://solomonkurz.netlify.app/blog/2019-02-16-bayesian-correlations-let-s-talk-options/</span></span>
+<span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a>test_retest_cor <span class="ot">=</span> <span class="fu">data.frame</span>(subj_est_time_1, subj_est_time_2) <span class="sc">%&gt;%</span></span>
+<span id="cb32-3"><a href="#cb32-3" aria-hidden="true" tabindex="-1"></a>  <span class="co"># scale() %&gt;%</span></span>
+<span id="cb32-4"><a href="#cb32-4" aria-hidden="true" tabindex="-1"></a>  brms<span class="sc">::</span><span class="fu">brm</span>(</span>
+<span id="cb32-5"><a href="#cb32-5" aria-hidden="true" tabindex="-1"></a>       <span class="co"># bf(mvbind(subj_est_time_2,subj_est_time_1 ) ~ 1) + set_rescor(TRUE),</span></span>
+<span id="cb32-6"><a href="#cb32-6" aria-hidden="true" tabindex="-1"></a>       <span class="fu">bf</span>(<span class="fu">mvbind</span>(subj_est_time_2,subj_est_time_1 ) <span class="sc">~</span> <span class="dv">1</span>,</span>
+<span id="cb32-7"><a href="#cb32-7" aria-hidden="true" tabindex="-1"></a>         sigma <span class="sc">~</span> <span class="dv">1</span>) <span class="sc">+</span> <span class="fu">set_rescor</span>(<span class="cn">TRUE</span>),</span>
+<span id="cb32-8"><a href="#cb32-8" aria-hidden="true" tabindex="-1"></a>       <span class="at">data =</span> .,</span>
+<span id="cb32-9"><a href="#cb32-9" aria-hidden="true" tabindex="-1"></a>       <span class="at">chains =</span> <span class="dv">2</span>,</span>
+<span id="cb32-10"><a href="#cb32-10" aria-hidden="true" tabindex="-1"></a>       <span class="at">cores =</span> <span class="dv">2</span>,</span>
+<span id="cb32-11"><a href="#cb32-11" aria-hidden="true" tabindex="-1"></a>       <span class="at">iter =</span> <span class="dv">10000</span>,</span>
+<span id="cb32-12"><a href="#cb32-12" aria-hidden="true" tabindex="-1"></a>       <span class="at">backend =</span> <span class="st">"cmdstanr"</span>,</span>
+<span id="cb32-13"><a href="#cb32-13" aria-hidden="true" tabindex="-1"></a>       <span class="at">threads =</span> <span class="fu">threading</span>(<span class="dv">4</span>)</span>
+<span id="cb32-14"><a href="#cb32-14" aria-hidden="true" tabindex="-1"></a>       )</span>
+<span id="cb32-15"><a href="#cb32-15" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb32-16"><a href="#cb32-16" aria-hidden="true" tabindex="-1"></a>tidybayes<span class="sc">::</span><span class="fu">get_variables</span>(test_retest_cor)</span>
+<span id="cb32-17"><a href="#cb32-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb32-18"><a href="#cb32-18" aria-hidden="true" tabindex="-1"></a>test_retest_cor_posterior <span class="ot">=</span> test_retest_cor <span class="sc">%&gt;%</span></span>
+<span id="cb32-19"><a href="#cb32-19" aria-hidden="true" tabindex="-1"></a>  tidybayes<span class="sc">::</span><span class="fu">spread_draws</span>(rescor__subjesttime2__subjesttime1)</span>
+<span id="cb32-20"><a href="#cb32-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb32-21"><a href="#cb32-21" aria-hidden="true" tabindex="-1"></a><span class="co"># I'm not sure if drawing from the predictive distribtions of both things makes sense here</span></span>
+<span id="cb32-22"><a href="#cb32-22" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> (<span class="cn">FALSE</span>){</span>
+<span id="cb32-23"><a href="#cb32-23" aria-hidden="true" tabindex="-1"></a>  subj_draws_time_1 <span class="ot">=</span> subj_draws_time_1[,<span class="fu">sample</span>(<span class="fu">ncol</span>(subj_draws_time_1), <span class="at">replace =</span> <span class="cn">FALSE</span>)]</span>
+<span id="cb32-24"><a href="#cb32-24" aria-hidden="true" tabindex="-1"></a>  subj_draws_time_2 <span class="ot">=</span> subj_draws_time_2[,<span class="fu">sample</span>(<span class="fu">ncol</span>(subj_draws_time_2), <span class="at">replace =</span> <span class="cn">FALSE</span>)]</span>
+<span id="cb32-25"><a href="#cb32-25" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb32-26"><a href="#cb32-26" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb32-27"><a href="#cb32-27" aria-hidden="true" tabindex="-1"></a>  test_retest_posterior <span class="ot">=</span> <span class="fu">sapply</span>(<span class="dv">1</span><span class="sc">:</span><span class="fu">ncol</span>(subj_draws_time_1), <span class="cf">function</span>(i)</span>
+<span id="cb32-28"><a href="#cb32-28" aria-hidden="true" tabindex="-1"></a>    <span class="fu">cor</span>(subj_draws_time_1[,i], subj_draws_time_2[,i])</span>
+<span id="cb32-29"><a href="#cb32-29" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb32-30"><a href="#cb32-30" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb32-31"><a href="#cb32-31" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mean</span>(test_retest_posterior)</span>
+<span id="cb32-32"><a href="#cb32-32" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb32-33"><a href="#cb32-33" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
 <section id="plot-relative-measurement-precision-estimates" class="level1">
 <h1>Plot relative measurement precision estimates</h1>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb36"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a><span class="fu">data.frame</span>(<span class="st">`</span><span class="at">Test-Retest Posterior</span><span class="st">`</span> <span class="ot">=</span> test_retest_cor_posterior<span class="sc">$</span>rescor__subjesttime2__subjesttime1, <span class="st">`</span><span class="at">Internal Consistency Time 1</span><span class="st">`</span> <span class="ot">=</span> rmp_time1<span class="sc">$</span>rmp_posterior,  <span class="st">`</span><span class="at">Internal Consistency Time 2</span><span class="st">`</span> <span class="ot">=</span> rmp_time2<span class="sc">$</span>rmp_posterior) <span class="sc">%&gt;%</span> </span>
-<span id="cb36-2"><a href="#cb36-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_longer</span>(<span class="at">cols =</span> <span class="fu">everything</span>()) <span class="sc">%&gt;%</span></span>
-<span id="cb36-3"><a href="#cb36-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> value, <span class="at">group =</span> name, <span class="at">col =</span> name, <span class="at">fill =</span> name)) <span class="sc">+</span></span>
-<span id="cb36-4"><a href="#cb36-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_density</span>(<span class="at">alpha =</span> .<span class="dv">3</span>) <span class="sc">+</span> </span>
-<span id="cb36-5"><a href="#cb36-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_bw</span>() <span class="sc">+</span> </span>
-<span id="cb36-6"><a href="#cb36-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(</span>
-<span id="cb36-7"><a href="#cb36-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">legend.position =</span> <span class="fu">c</span>(.<span class="dv">1</span>, .<span class="dv">9</span>),</span>
-<span id="cb36-8"><a href="#cb36-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">legend.justification =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">1</span>)</span>
-<span id="cb36-9"><a href="#cb36-9" aria-hidden="true" tabindex="-1"></a>  )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb33"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a><span class="fu">data.frame</span>(<span class="st">`</span><span class="at">Test-Retest Posterior</span><span class="st">`</span> <span class="ot">=</span> test_retest_cor_posterior<span class="sc">$</span>rescor__subjesttime2__subjesttime1, <span class="st">`</span><span class="at">Internal Consistency Time 1</span><span class="st">`</span> <span class="ot">=</span> rmp_time1<span class="sc">$</span>rmp_posterior,  <span class="st">`</span><span class="at">Internal Consistency Time 2</span><span class="st">`</span> <span class="ot">=</span> rmp_time2<span class="sc">$</span>rmp_posterior) <span class="sc">%&gt;%</span> </span>
+<span id="cb33-2"><a href="#cb33-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_longer</span>(<span class="at">cols =</span> <span class="fu">everything</span>()) <span class="sc">%&gt;%</span></span>
+<span id="cb33-3"><a href="#cb33-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> value, <span class="at">group =</span> name, <span class="at">col =</span> name, <span class="at">fill =</span> name)) <span class="sc">+</span></span>
+<span id="cb33-4"><a href="#cb33-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_density</span>(<span class="at">alpha =</span> .<span class="dv">3</span>) <span class="sc">+</span> </span>
+<span id="cb33-5"><a href="#cb33-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_bw</span>() <span class="sc">+</span> </span>
+<span id="cb33-6"><a href="#cb33-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(</span>
+<span id="cb33-7"><a href="#cb33-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">legend.position =</span> <span class="fu">c</span>(.<span class="dv">1</span>, .<span class="dv">9</span>),</span>
+<span id="cb33-8"><a href="#cb33-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">legend.justification =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">1</span>)</span>
+<span id="cb33-9"><a href="#cb33-9" aria-hidden="true" tabindex="-1"></a>  )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
@@ -1413,52 +1195,53 @@ Total execution time: 6.1 seconds.</code></pre>
 <p>If we just calculate <code>d'</code> using the transformed hit rate and false alarm rate, using the formula above, does this give us estimates that are very different, or less reliable?</p>
 <p>The answer appears to be no, the estimates are very similar regardless of which approach we take:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb37"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a>two_stage_estimate <span class="ot">=</span> </span>
-<span id="cb37-2"><a href="#cb37-2" aria-hidden="true" tabindex="-1"></a> data_long_summarised <span class="sc">%&gt;%</span></span>
-<span id="cb37-3"><a href="#cb37-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span>condition_contrast) <span class="sc">%&gt;%</span></span>
-<span id="cb37-4"><a href="#cb37-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">condition =</span> <span class="fu">factor</span>(<span class="fu">ifelse</span>(condition<span class="sc">==</span><span class="dv">0</span>,<span class="st">"go"</span>,<span class="st">"nogo"</span>))) <span class="sc">%&gt;%</span></span>
-<span id="cb37-5"><a href="#cb37-5" aria-hidden="true" tabindex="-1"></a>  <span class="co"># correct perfect scores</span></span>
-<span id="cb37-6"><a href="#cb37-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rowwise</span>() <span class="sc">%&gt;%</span></span>
-<span id="cb37-7"><a href="#cb37-7" aria-hidden="true" tabindex="-1"></a>  <span class="co"># mutate(</span></span>
-<span id="cb37-8"><a href="#cb37-8" aria-hidden="true" tabindex="-1"></a>  <span class="co">#   n_go = ifelse(n_go ==450 &amp; condition=="go",   449.5, n_go),</span></span>
-<span id="cb37-9"><a href="#cb37-9" aria-hidden="true" tabindex="-1"></a>  <span class="co">#   n_go = ifelse(n_go ==0,                       .5   , n_go),</span></span>
-<span id="cb37-10"><a href="#cb37-10" aria-hidden="true" tabindex="-1"></a>  <span class="co">#   n_go = ifelse(n_go ==150 &amp; condition=="nogo", 149.5, n_go)</span></span>
-<span id="cb37-11"><a href="#cb37-11" aria-hidden="true" tabindex="-1"></a>  <span class="co"># ) %&gt;%</span></span>
-<span id="cb37-12"><a href="#cb37-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_wider</span>(</span>
-<span id="cb37-13"><a href="#cb37-13" aria-hidden="true" tabindex="-1"></a>    <span class="at">id_cols =</span> pps,</span>
-<span id="cb37-14"><a href="#cb37-14" aria-hidden="true" tabindex="-1"></a>    <span class="at">names_from =</span> <span class="fu">c</span>(condition, session),</span>
-<span id="cb37-15"><a href="#cb37-15" aria-hidden="true" tabindex="-1"></a>    <span class="at">values_from =</span> <span class="fu">c</span>(n, n_go),</span>
-<span id="cb37-16"><a href="#cb37-16" aria-hidden="true" tabindex="-1"></a>    <span class="at">names_glue =</span> <span class="st">"{condition}_t{session}_{.value}"</span></span>
-<span id="cb37-17"><a href="#cb37-17" aria-hidden="true" tabindex="-1"></a>              ) <span class="sc">%&gt;%</span></span>
-<span id="cb37-18"><a href="#cb37-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
-<span id="cb37-19"><a href="#cb37-19" aria-hidden="true" tabindex="-1"></a>    <span class="at">hit_rate_t1        =</span> go_t1_n_go<span class="sc">/</span>(go_t1_n),</span>
-<span id="cb37-20"><a href="#cb37-20" aria-hidden="true" tabindex="-1"></a>    <span class="at">falsealarm_rate_t1 =</span> nogo_t1_n_go<span class="sc">/</span>nogo_t1_n,</span>
-<span id="cb37-21"><a href="#cb37-21" aria-hidden="true" tabindex="-1"></a>    <span class="at">hit_rate_t2        =</span> go_t2_n_go<span class="sc">/</span>go_t2_n,</span>
-<span id="cb37-22"><a href="#cb37-22" aria-hidden="true" tabindex="-1"></a>    <span class="at">falsealarm_rate_t2 =</span> nogo_t2_n_go<span class="sc">/</span>nogo_t2_n,</span>
-<span id="cb37-23"><a href="#cb37-23" aria-hidden="true" tabindex="-1"></a>    <span class="at">d_prime_t1         =</span> <span class="fu">qnorm</span>(hit_rate_t1) <span class="sc">-</span> <span class="fu">qnorm</span>(falsealarm_rate_t1),</span>
-<span id="cb37-24"><a href="#cb37-24" aria-hidden="true" tabindex="-1"></a>    <span class="at">d_prime_t2         =</span> <span class="fu">qnorm</span>(hit_rate_t2) <span class="sc">-</span> <span class="fu">qnorm</span>(falsealarm_rate_t2)</span>
-<span id="cb37-25"><a href="#cb37-25" aria-hidden="true" tabindex="-1"></a>  )</span>
-<span id="cb37-26"><a href="#cb37-26" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb37-27"><a href="#cb37-27" aria-hidden="true" tabindex="-1"></a>data_plot <span class="ot">=</span> <span class="fu">data.frame</span>(</span>
-<span id="cb37-28"><a href="#cb37-28" aria-hidden="true" tabindex="-1"></a>  <span class="st">`</span><span class="at">Simple d' T1</span><span class="st">`</span> <span class="ot">=</span> two_stage_estimate<span class="sc">$</span>d_prime_t1,</span>
-<span id="cb37-29"><a href="#cb37-29" aria-hidden="true" tabindex="-1"></a>  <span class="st">`</span><span class="at">Simple d' T2</span><span class="st">`</span> <span class="ot">=</span> two_stage_estimate<span class="sc">$</span>d_prime_t2,</span>
-<span id="cb37-30"><a href="#cb37-30" aria-hidden="true" tabindex="-1"></a>  <span class="st">`</span><span class="at">Bayes d' T1</span><span class="st">`</span> <span class="ot">=</span> subj_est_time_1,</span>
-<span id="cb37-31"><a href="#cb37-31" aria-hidden="true" tabindex="-1"></a>  <span class="st">`</span><span class="at">Bayes d' T2</span><span class="st">`</span> <span class="ot">=</span> subj_est_time_2</span>
-<span id="cb37-32"><a href="#cb37-32" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb37-33"><a href="#cb37-33" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb37-34"><a href="#cb37-34" aria-hidden="true" tabindex="-1"></a>data_plot <span class="sc">%&gt;%</span></span>
-<span id="cb37-35"><a href="#cb37-35" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> Simple.d..T1, Bayes.d..T1)) <span class="sc">+</span> </span>
-<span id="cb37-36"><a href="#cb37-36" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>() <span class="sc">+</span> </span>
-<span id="cb37-37"><a href="#cb37-37" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_bw</span>() <span class="sc">+</span> </span>
-<span id="cb37-38"><a href="#cb37-38" aria-hidden="true" tabindex="-1"></a>  <span class="fu">annotate</span>(<span class="st">"text"</span>, <span class="at">x =</span> <span class="dv">1</span>, <span class="at">y =</span> <span class="dv">2</span>, </span>
-<span id="cb37-39"><a href="#cb37-39" aria-hidden="true" tabindex="-1"></a>           <span class="at">label =</span> <span class="fu">paste</span>(<span class="st">"Correlation: "</span>, <span class="fu">round</span>(<span class="fu">cor</span>(two_stage_estimate<span class="sc">$</span>d_prime_t1,subj_est_time_1), <span class="dv">4</span>)), </span>
-<span id="cb37-40"><a href="#cb37-40" aria-hidden="true" tabindex="-1"></a>           <span class="at">hjust =</span> <span class="dv">0</span>, <span class="at">vjust =</span> <span class="dv">1</span>, <span class="at">size =</span> <span class="dv">5</span>) <span class="sc">+</span></span>
-<span id="cb37-41"><a href="#cb37-41" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
-<span id="cb37-42"><a href="#cb37-42" aria-hidden="true" tabindex="-1"></a>    <span class="at">x =</span> <span class="st">"Simple d' T1"</span>,</span>
-<span id="cb37-43"><a href="#cb37-43" aria-hidden="true" tabindex="-1"></a>    <span class="at">y =</span> <span class="st">"Bayes d' T1"</span>,</span>
-<span id="cb37-44"><a href="#cb37-44" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">"Correlation between Bayesian regression d' and simple estimates"</span>,</span>
-<span id="cb37-45"><a href="#cb37-45" aria-hidden="true" tabindex="-1"></a>    <span class="at">subtitle =</span> <span class="st">"Simple estimates = qnorm(hit rate) - qnorm(false alarm rate)"</span></span>
-<span id="cb37-46"><a href="#cb37-46" aria-hidden="true" tabindex="-1"></a>  )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb34"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a>two_stage_estimate <span class="ot">=</span> </span>
+<span id="cb34-2"><a href="#cb34-2" aria-hidden="true" tabindex="-1"></a> data_long_summarised <span class="sc">%&gt;%</span></span>
+<span id="cb34-3"><a href="#cb34-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span>condition_contrast) <span class="sc">%&gt;%</span></span>
+<span id="cb34-4"><a href="#cb34-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">condition =</span> <span class="fu">factor</span>(<span class="fu">ifelse</span>(condition<span class="sc">==</span><span class="dv">0</span>,<span class="st">"go"</span>,<span class="st">"nogo"</span>))) <span class="sc">%&gt;%</span></span>
+<span id="cb34-5"><a href="#cb34-5" aria-hidden="true" tabindex="-1"></a>  <span class="co"># correct perfect scores</span></span>
+<span id="cb34-6"><a href="#cb34-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rowwise</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb34-7"><a href="#cb34-7" aria-hidden="true" tabindex="-1"></a>  <span class="co"># mutate(</span></span>
+<span id="cb34-8"><a href="#cb34-8" aria-hidden="true" tabindex="-1"></a>  <span class="co">#   n_go = ifelse(n_go ==450 &amp; condition=="go",   449.5, n_go),</span></span>
+<span id="cb34-9"><a href="#cb34-9" aria-hidden="true" tabindex="-1"></a>  <span class="co">#   n_go = ifelse(n_go ==0,                       .5   , n_go),</span></span>
+<span id="cb34-10"><a href="#cb34-10" aria-hidden="true" tabindex="-1"></a>  <span class="co">#   n_go = ifelse(n_go ==150 &amp; condition=="nogo", 149.5, n_go)</span></span>
+<span id="cb34-11"><a href="#cb34-11" aria-hidden="true" tabindex="-1"></a>  <span class="co"># ) %&gt;%</span></span>
+<span id="cb34-12"><a href="#cb34-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_wider</span>(</span>
+<span id="cb34-13"><a href="#cb34-13" aria-hidden="true" tabindex="-1"></a>    <span class="at">id_cols =</span> pps,</span>
+<span id="cb34-14"><a href="#cb34-14" aria-hidden="true" tabindex="-1"></a>    <span class="at">names_from =</span> <span class="fu">c</span>(condition, session),</span>
+<span id="cb34-15"><a href="#cb34-15" aria-hidden="true" tabindex="-1"></a>    <span class="at">values_from =</span> <span class="fu">c</span>(n, n_go),</span>
+<span id="cb34-16"><a href="#cb34-16" aria-hidden="true" tabindex="-1"></a>    <span class="at">names_glue =</span> <span class="st">"{condition}_t{session}_{.value}"</span></span>
+<span id="cb34-17"><a href="#cb34-17" aria-hidden="true" tabindex="-1"></a>              ) <span class="sc">%&gt;%</span></span>
+<span id="cb34-18"><a href="#cb34-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb34-19"><a href="#cb34-19" aria-hidden="true" tabindex="-1"></a>    <span class="at">hit_rate_t1        =</span> go_t1_n_go<span class="sc">/</span>(go_t1_n),</span>
+<span id="cb34-20"><a href="#cb34-20" aria-hidden="true" tabindex="-1"></a>    <span class="at">falsealarm_rate_t1 =</span> nogo_t1_n_go<span class="sc">/</span>nogo_t1_n,</span>
+<span id="cb34-21"><a href="#cb34-21" aria-hidden="true" tabindex="-1"></a>    <span class="at">hit_rate_t2        =</span> go_t2_n_go<span class="sc">/</span>go_t2_n,</span>
+<span id="cb34-22"><a href="#cb34-22" aria-hidden="true" tabindex="-1"></a>    <span class="at">falsealarm_rate_t2 =</span> nogo_t2_n_go<span class="sc">/</span>nogo_t2_n,</span>
+<span id="cb34-23"><a href="#cb34-23" aria-hidden="true" tabindex="-1"></a>    <span class="at">d_prime_t1         =</span> <span class="fu">qnorm</span>(hit_rate_t1) <span class="sc">-</span> <span class="fu">qnorm</span>(falsealarm_rate_t1),</span>
+<span id="cb34-24"><a href="#cb34-24" aria-hidden="true" tabindex="-1"></a>    <span class="at">d_prime_t2         =</span> <span class="fu">qnorm</span>(hit_rate_t2) <span class="sc">-</span> <span class="fu">qnorm</span>(falsealarm_rate_t2)</span>
+<span id="cb34-25"><a href="#cb34-25" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb34-26"><a href="#cb34-26" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb34-27"><a href="#cb34-27" aria-hidden="true" tabindex="-1"></a>data_plot <span class="ot">=</span> <span class="fu">data.frame</span>(</span>
+<span id="cb34-28"><a href="#cb34-28" aria-hidden="true" tabindex="-1"></a>  <span class="st">`</span><span class="at">Simple d' T1</span><span class="st">`</span> <span class="ot">=</span> two_stage_estimate<span class="sc">$</span>d_prime_t1,</span>
+<span id="cb34-29"><a href="#cb34-29" aria-hidden="true" tabindex="-1"></a>  <span class="st">`</span><span class="at">Simple d' T2</span><span class="st">`</span> <span class="ot">=</span> two_stage_estimate<span class="sc">$</span>d_prime_t2,</span>
+<span id="cb34-30"><a href="#cb34-30" aria-hidden="true" tabindex="-1"></a>  <span class="st">`</span><span class="at">Bayes d' T1</span><span class="st">`</span> <span class="ot">=</span> subj_est_time_1,</span>
+<span id="cb34-31"><a href="#cb34-31" aria-hidden="true" tabindex="-1"></a>  <span class="st">`</span><span class="at">Bayes d' T2</span><span class="st">`</span> <span class="ot">=</span> subj_est_time_2</span>
+<span id="cb34-32"><a href="#cb34-32" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb34-33"><a href="#cb34-33" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb34-34"><a href="#cb34-34" aria-hidden="true" tabindex="-1"></a>data_plot <span class="sc">%&gt;%</span></span>
+<span id="cb34-35"><a href="#cb34-35" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> Simple.d..T1, Bayes.d..T1)) <span class="sc">+</span> </span>
+<span id="cb34-36"><a href="#cb34-36" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_abline</span>(<span class="at">slope =</span> <span class="dv">1</span>, <span class="at">intercept =</span> <span class="dv">0</span>) <span class="sc">+</span></span>
+<span id="cb34-37"><a href="#cb34-37" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>() <span class="sc">+</span> </span>
+<span id="cb34-38"><a href="#cb34-38" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_bw</span>() <span class="sc">+</span> </span>
+<span id="cb34-39"><a href="#cb34-39" aria-hidden="true" tabindex="-1"></a>  <span class="fu">annotate</span>(<span class="st">"text"</span>, <span class="at">x =</span> <span class="dv">1</span>, <span class="at">y =</span> <span class="fl">4.5</span>, </span>
+<span id="cb34-40"><a href="#cb34-40" aria-hidden="true" tabindex="-1"></a>           <span class="at">label =</span> <span class="fu">paste</span>(<span class="st">"Correlation: "</span>, <span class="fu">round</span>(<span class="fu">cor</span>(two_stage_estimate<span class="sc">$</span>d_prime_t1,subj_est_time_1), <span class="dv">4</span>)), </span>
+<span id="cb34-41"><a href="#cb34-41" aria-hidden="true" tabindex="-1"></a>           <span class="at">hjust =</span> <span class="dv">0</span>, <span class="at">vjust =</span> <span class="dv">1</span>, <span class="at">size =</span> <span class="dv">8</span>) <span class="sc">+</span></span>
+<span id="cb34-42"><a href="#cb34-42" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
+<span id="cb34-43"><a href="#cb34-43" aria-hidden="true" tabindex="-1"></a>    <span class="at">x =</span> <span class="st">"Simple d' T1"</span>,</span>
+<span id="cb34-44"><a href="#cb34-44" aria-hidden="true" tabindex="-1"></a>    <span class="at">y =</span> <span class="st">"Bayes d' T1"</span>,</span>
+<span id="cb34-45"><a href="#cb34-45" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">"Correlation between Bayesian regression d' and simple estimates"</span>,</span>
+<span id="cb34-46"><a href="#cb34-46" aria-hidden="true" tabindex="-1"></a>    <span class="at">subtitle =</span> <span class="st">"Simple estimates = qnorm(hit rate) - qnorm(false alarm rate)"</span></span>
+<span id="cb34-47"><a href="#cb34-47" aria-hidden="true" tabindex="-1"></a>  )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
@@ -1466,19 +1249,20 @@ Total execution time: 6.1 seconds.</code></pre>
 </figure>
 </div>
 </div>
-<div class="sourceCode cell-code" id="cb38"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a>data_plot <span class="sc">%&gt;%</span></span>
-<span id="cb38-2"><a href="#cb38-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> Simple.d..T2, Bayes.d..T2)) <span class="sc">+</span> </span>
-<span id="cb38-3"><a href="#cb38-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>() <span class="sc">+</span> </span>
-<span id="cb38-4"><a href="#cb38-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_bw</span>() <span class="sc">+</span> </span>
-<span id="cb38-5"><a href="#cb38-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">annotate</span>(<span class="st">"text"</span>, <span class="at">x =</span> <span class="dv">1</span>, <span class="at">y =</span> <span class="dv">2</span>, </span>
-<span id="cb38-6"><a href="#cb38-6" aria-hidden="true" tabindex="-1"></a>           <span class="at">label =</span> <span class="fu">paste</span>(<span class="st">"Correlation: "</span>, <span class="fu">round</span>(<span class="fu">cor</span>(two_stage_estimate<span class="sc">$</span>d_prime_t2,subj_est_time_2), <span class="dv">4</span>)), </span>
-<span id="cb38-7"><a href="#cb38-7" aria-hidden="true" tabindex="-1"></a>           <span class="at">hjust =</span> <span class="dv">0</span>, <span class="at">vjust =</span> <span class="dv">1</span>, <span class="at">size =</span> <span class="dv">5</span>) <span class="sc">+</span></span>
-<span id="cb38-8"><a href="#cb38-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
-<span id="cb38-9"><a href="#cb38-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">x =</span> <span class="st">"Simple d' T2"</span>,</span>
-<span id="cb38-10"><a href="#cb38-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">y =</span> <span class="st">"Bayes d' T2"</span>,</span>
-<span id="cb38-11"><a href="#cb38-11" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">"Correlation between Bayesian regression d' and simple estimates"</span>,</span>
-<span id="cb38-12"><a href="#cb38-12" aria-hidden="true" tabindex="-1"></a>    <span class="at">subtitle =</span> <span class="st">"Simple estimates = qnorm(hit rate) - qnorm(false alarm rate)"</span></span>
-<span id="cb38-13"><a href="#cb38-13" aria-hidden="true" tabindex="-1"></a>  )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb35"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a>data_plot <span class="sc">%&gt;%</span></span>
+<span id="cb35-2"><a href="#cb35-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> Simple.d..T2, Bayes.d..T2)) <span class="sc">+</span> </span>
+<span id="cb35-3"><a href="#cb35-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_abline</span>(<span class="at">slope =</span> <span class="dv">1</span>, <span class="at">intercept =</span> <span class="dv">0</span>) <span class="sc">+</span></span>
+<span id="cb35-4"><a href="#cb35-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>() <span class="sc">+</span> </span>
+<span id="cb35-5"><a href="#cb35-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_bw</span>() <span class="sc">+</span> </span>
+<span id="cb35-6"><a href="#cb35-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">annotate</span>(<span class="st">"text"</span>, <span class="at">x =</span> <span class="dv">1</span>, <span class="at">y =</span> <span class="fl">4.5</span>, </span>
+<span id="cb35-7"><a href="#cb35-7" aria-hidden="true" tabindex="-1"></a>           <span class="at">label =</span> <span class="fu">paste</span>(<span class="st">"Correlation: "</span>, <span class="fu">round</span>(<span class="fu">cor</span>(two_stage_estimate<span class="sc">$</span>d_prime_t2,subj_est_time_2), <span class="dv">4</span>)), </span>
+<span id="cb35-8"><a href="#cb35-8" aria-hidden="true" tabindex="-1"></a>           <span class="at">hjust =</span> <span class="dv">0</span>, <span class="at">vjust =</span> <span class="dv">1</span>, <span class="at">size =</span> <span class="dv">8</span>) <span class="sc">+</span></span>
+<span id="cb35-9"><a href="#cb35-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
+<span id="cb35-10"><a href="#cb35-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">x =</span> <span class="st">"Simple d' T2"</span>,</span>
+<span id="cb35-11"><a href="#cb35-11" aria-hidden="true" tabindex="-1"></a>    <span class="at">y =</span> <span class="st">"Bayes d' T2"</span>,</span>
+<span id="cb35-12"><a href="#cb35-12" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">"Correlation between Bayesian regression d' and simple estimates"</span>,</span>
+<span id="cb35-13"><a href="#cb35-13" aria-hidden="true" tabindex="-1"></a>    <span class="at">subtitle =</span> <span class="st">"Simple estimates = qnorm(hit rate) - qnorm(false alarm rate)"</span></span>
+<span id="cb35-14"><a href="#cb35-14" aria-hidden="true" tabindex="-1"></a>  ) </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
@@ -1486,13 +1270,13 @@ Total execution time: 6.1 seconds.</code></pre>
 </figure>
 </div>
 </div>
-<div class="sourceCode cell-code" id="cb39"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a><span class="co"># cor.test(qnorm(two_stage_estimate$hit_rate_t2), qnorm(two_stage_estimate$falsealarm_rate_t1))</span></span>
-<span id="cb39-2"><a href="#cb39-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb39-3"><a href="#cb39-3" aria-hidden="true" tabindex="-1"></a><span class="co"># cor.test(two_stage_estimate$d_prime_t1, two_stage_estimate$d_prime_t2)</span></span>
-<span id="cb39-4"><a href="#cb39-4" aria-hidden="true" tabindex="-1"></a><span class="co"># </span></span>
-<span id="cb39-5"><a href="#cb39-5" aria-hidden="true" tabindex="-1"></a><span class="co"># plot(two_stage_estimate$d_prime_t1, subj_est_time_1)</span></span>
-<span id="cb39-6"><a href="#cb39-6" aria-hidden="true" tabindex="-1"></a><span class="co"># </span></span>
-<span id="cb39-7"><a href="#cb39-7" aria-hidden="true" tabindex="-1"></a><span class="co"># plot(two_stage_estimate$d_prime_t2, subj_est_time_2)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb36"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a><span class="co"># cor.test(qnorm(two_stage_estimate$hit_rate_t2), qnorm(two_stage_estimate$falsealarm_rate_t1))</span></span>
+<span id="cb36-2"><a href="#cb36-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb36-3"><a href="#cb36-3" aria-hidden="true" tabindex="-1"></a><span class="co"># cor.test(two_stage_estimate$d_prime_t1, two_stage_estimate$d_prime_t2)</span></span>
+<span id="cb36-4"><a href="#cb36-4" aria-hidden="true" tabindex="-1"></a><span class="co"># </span></span>
+<span id="cb36-5"><a href="#cb36-5" aria-hidden="true" tabindex="-1"></a><span class="co"># plot(two_stage_estimate$d_prime_t1, subj_est_time_1)</span></span>
+<span id="cb36-6"><a href="#cb36-6" aria-hidden="true" tabindex="-1"></a><span class="co"># </span></span>
+<span id="cb36-7"><a href="#cb36-7" aria-hidden="true" tabindex="-1"></a><span class="co"># plot(two_stage_estimate$d_prime_t2, subj_est_time_2)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>Because the point-estimates are so similar, the test-retest reliability should be pretty similar too.</p>
 <p>This just highlights that there isn’t anything magical about Bayesian or more fancy statistical methods. They don’t by default provide better estimates.</p>
@@ -1502,119 +1286,92 @@ Total execution time: 6.1 seconds.</code></pre>
 <h1>Split-half approach</h1>
 <p>Finally, I checked how similar RMP estimates are to the standard split-half reliability estimates.</p>
 <p>To calculate split-half reliability, I created two datasets with odd and even trials respectively. I then calculated d’ using the transformed hit and false alarm rates, and calculated the correlation between split-half estimates at each time point. These correlations are then transformed using the <a href="#0">Spearman-Brown “prophecy” formula</a>.</p>
+<p>The results are quite similar, though the split-half estimates are slightly higher.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb40"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb40-1"><a href="#cb40-1" aria-hidden="true" tabindex="-1"></a>data_long_odd <span class="ot">=</span> data_long <span class="sc">%&gt;%</span></span>
-<span id="cb40-2"><a href="#cb40-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(trial <span class="sc">%%</span> <span class="dv">2</span> <span class="sc">==</span> <span class="dv">1</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb40-3"><a href="#cb40-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(pps, session, condition) <span class="sc">%&gt;%</span></span>
-<span id="cb40-4"><a href="#cb40-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">summarise</span>(</span>
-<span id="cb40-5"><a href="#cb40-5" aria-hidden="true" tabindex="-1"></a>      <span class="at">n         =</span> <span class="fu">n</span>(),</span>
-<span id="cb40-6"><a href="#cb40-6" aria-hidden="true" tabindex="-1"></a>      <span class="at">n_correct =</span> <span class="fu">sum</span>(correct)</span>
-<span id="cb40-7"><a href="#cb40-7" aria-hidden="true" tabindex="-1"></a>    ) <span class="sc">%&gt;%</span></span>
-<span id="cb40-8"><a href="#cb40-8" aria-hidden="true" tabindex="-1"></a>    <span class="fu">ungroup</span>() <span class="sc">%&gt;%</span></span>
-<span id="cb40-9"><a href="#cb40-9" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(</span>
-<span id="cb40-10"><a href="#cb40-10" aria-hidden="true" tabindex="-1"></a>      <span class="at">n_go =</span> <span class="fu">ifelse</span>(condition <span class="sc">==</span> <span class="dv">0</span>, n_correct, n <span class="sc">-</span> n_correct)</span>
-<span id="cb40-11"><a href="#cb40-11" aria-hidden="true" tabindex="-1"></a>    ) <span class="sc">%&gt;%</span></span>
-<span id="cb40-12"><a href="#cb40-12" aria-hidden="true" tabindex="-1"></a>    <span class="fu">ungroup</span>() <span class="sc">%&gt;%</span></span>
-<span id="cb40-13"><a href="#cb40-13" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(</span>
-<span id="cb40-14"><a href="#cb40-14" aria-hidden="true" tabindex="-1"></a>      <span class="at">n_go =</span> <span class="fu">ifelse</span>(n_go <span class="sc">==</span> n, n_go <span class="sc">-</span> <span class="dv">1</span>, n_go),</span>
-<span id="cb40-15"><a href="#cb40-15" aria-hidden="true" tabindex="-1"></a>      <span class="at">n_go =</span> <span class="fu">ifelse</span>(n_go <span class="sc">==</span><span class="dv">0</span>,                  <span class="dv">1</span>  , n_go)</span>
-<span id="cb40-16"><a href="#cb40-16" aria-hidden="true" tabindex="-1"></a>    ) <span class="sc">%&gt;%</span></span>
-<span id="cb40-17"><a href="#cb40-17" aria-hidden="true" tabindex="-1"></a>    <span class="fu">arrange</span>(pps) <span class="sc">%&gt;%</span></span>
-<span id="cb40-18"><a href="#cb40-18" aria-hidden="true" tabindex="-1"></a>    <span class="fu">ungroup</span>() <span class="sc">%&gt;%</span></span>
-<span id="cb40-19"><a href="#cb40-19" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="at">condition =</span> <span class="fu">factor</span>(<span class="fu">ifelse</span>(condition <span class="sc">==</span> <span class="dv">0</span>, <span class="st">"go"</span>, <span class="st">"nogo"</span>))) <span class="sc">%&gt;%</span></span>
-<span id="cb40-20"><a href="#cb40-20" aria-hidden="true" tabindex="-1"></a>    <span class="fu">pivot_wider</span>(</span>
-<span id="cb40-21"><a href="#cb40-21" aria-hidden="true" tabindex="-1"></a>      <span class="at">id_cols =</span> pps,</span>
-<span id="cb40-22"><a href="#cb40-22" aria-hidden="true" tabindex="-1"></a>      <span class="at">names_from =</span> <span class="fu">c</span>(condition, session),</span>
-<span id="cb40-23"><a href="#cb40-23" aria-hidden="true" tabindex="-1"></a>      <span class="at">values_from =</span> <span class="fu">c</span>(n, n_go),</span>
-<span id="cb40-24"><a href="#cb40-24" aria-hidden="true" tabindex="-1"></a>      <span class="at">names_glue =</span> <span class="st">"{condition}_t{session}_{.value}"</span></span>
-<span id="cb40-25"><a href="#cb40-25" aria-hidden="true" tabindex="-1"></a>    ) <span class="sc">%&gt;%</span></span>
-<span id="cb40-26"><a href="#cb40-26" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(</span>
-<span id="cb40-27"><a href="#cb40-27" aria-hidden="true" tabindex="-1"></a>      <span class="at">hit_rate_t1        =</span> go_t1_n_go <span class="sc">/</span> go_t1_n,</span>
-<span id="cb40-28"><a href="#cb40-28" aria-hidden="true" tabindex="-1"></a>      <span class="at">falsealarm_rate_t1 =</span> nogo_t1_n_go <span class="sc">/</span> nogo_t1_n,</span>
-<span id="cb40-29"><a href="#cb40-29" aria-hidden="true" tabindex="-1"></a>      <span class="at">hit_rate_t2        =</span> go_t2_n_go <span class="sc">/</span> go_t2_n,</span>
-<span id="cb40-30"><a href="#cb40-30" aria-hidden="true" tabindex="-1"></a>      <span class="at">falsealarm_rate_t2 =</span> nogo_t2_n_go <span class="sc">/</span> nogo_t2_n,</span>
-<span id="cb40-31"><a href="#cb40-31" aria-hidden="true" tabindex="-1"></a>      <span class="at">d_prime_t1         =</span> <span class="fu">qnorm</span>(hit_rate_t1) <span class="sc">-</span> <span class="fu">qnorm</span>(falsealarm_rate_t1),</span>
-<span id="cb40-32"><a href="#cb40-32" aria-hidden="true" tabindex="-1"></a>      <span class="at">d_prime_t2         =</span> <span class="fu">qnorm</span>(hit_rate_t2) <span class="sc">-</span> <span class="fu">qnorm</span>(falsealarm_rate_t2)</span>
-<span id="cb40-33"><a href="#cb40-33" aria-hidden="true" tabindex="-1"></a>    )</span>
-<span id="cb40-34"><a href="#cb40-34" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb40-35"><a href="#cb40-35" aria-hidden="true" tabindex="-1"></a>data_long_even <span class="ot">=</span> data_long <span class="sc">%&gt;%</span></span>
-<span id="cb40-36"><a href="#cb40-36" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(trial <span class="sc">%%</span> <span class="dv">2</span> <span class="sc">==</span> <span class="dv">0</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb40-37"><a href="#cb40-37" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(pps, session, condition) <span class="sc">%&gt;%</span></span>
-<span id="cb40-38"><a href="#cb40-38" aria-hidden="true" tabindex="-1"></a>    <span class="fu">summarise</span>(</span>
-<span id="cb40-39"><a href="#cb40-39" aria-hidden="true" tabindex="-1"></a>      <span class="at">n         =</span> <span class="fu">n</span>(),</span>
-<span id="cb40-40"><a href="#cb40-40" aria-hidden="true" tabindex="-1"></a>      <span class="at">n_correct =</span> <span class="fu">sum</span>(correct)</span>
-<span id="cb40-41"><a href="#cb40-41" aria-hidden="true" tabindex="-1"></a>    ) <span class="sc">%&gt;%</span></span>
-<span id="cb40-42"><a href="#cb40-42" aria-hidden="true" tabindex="-1"></a>    <span class="fu">ungroup</span>() <span class="sc">%&gt;%</span></span>
-<span id="cb40-43"><a href="#cb40-43" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(</span>
-<span id="cb40-44"><a href="#cb40-44" aria-hidden="true" tabindex="-1"></a>      <span class="at">n_go =</span> <span class="fu">ifelse</span>(condition <span class="sc">==</span> <span class="dv">0</span>, n_correct, n <span class="sc">-</span> n_correct)</span>
-<span id="cb40-45"><a href="#cb40-45" aria-hidden="true" tabindex="-1"></a>    ) <span class="sc">%&gt;%</span></span>
-<span id="cb40-46"><a href="#cb40-46" aria-hidden="true" tabindex="-1"></a>    <span class="fu">ungroup</span>() <span class="sc">%&gt;%</span></span>
-<span id="cb40-47"><a href="#cb40-47" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(</span>
-<span id="cb40-48"><a href="#cb40-48" aria-hidden="true" tabindex="-1"></a>      <span class="at">n_go =</span> <span class="fu">ifelse</span>(n_go <span class="sc">==</span> n, n_go <span class="sc">-</span> <span class="dv">1</span>, n_go),</span>
-<span id="cb40-49"><a href="#cb40-49" aria-hidden="true" tabindex="-1"></a>      <span class="at">n_go =</span> <span class="fu">ifelse</span>(n_go <span class="sc">==</span><span class="dv">0</span>,                  <span class="dv">1</span>  , n_go)</span>
-<span id="cb40-50"><a href="#cb40-50" aria-hidden="true" tabindex="-1"></a>    ) <span class="sc">%&gt;%</span></span>
-<span id="cb40-51"><a href="#cb40-51" aria-hidden="true" tabindex="-1"></a>    <span class="fu">arrange</span>(pps) <span class="sc">%&gt;%</span></span>
-<span id="cb40-52"><a href="#cb40-52" aria-hidden="true" tabindex="-1"></a>    <span class="fu">ungroup</span>() <span class="sc">%&gt;%</span></span>
-<span id="cb40-53"><a href="#cb40-53" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="at">condition =</span> <span class="fu">factor</span>(<span class="fu">ifelse</span>(condition <span class="sc">==</span> <span class="dv">0</span>, <span class="st">"go"</span>, <span class="st">"nogo"</span>))) <span class="sc">%&gt;%</span></span>
-<span id="cb40-54"><a href="#cb40-54" aria-hidden="true" tabindex="-1"></a>    <span class="fu">pivot_wider</span>(</span>
-<span id="cb40-55"><a href="#cb40-55" aria-hidden="true" tabindex="-1"></a>      <span class="at">id_cols =</span> pps,</span>
-<span id="cb40-56"><a href="#cb40-56" aria-hidden="true" tabindex="-1"></a>      <span class="at">names_from =</span> <span class="fu">c</span>(condition, session),</span>
-<span id="cb40-57"><a href="#cb40-57" aria-hidden="true" tabindex="-1"></a>      <span class="at">values_from =</span> <span class="fu">c</span>(n, n_go),</span>
-<span id="cb40-58"><a href="#cb40-58" aria-hidden="true" tabindex="-1"></a>      <span class="at">names_glue =</span> <span class="st">"{condition}_t{session}_{.value}"</span></span>
-<span id="cb40-59"><a href="#cb40-59" aria-hidden="true" tabindex="-1"></a>    ) <span class="sc">%&gt;%</span></span>
-<span id="cb40-60"><a href="#cb40-60" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(</span>
-<span id="cb40-61"><a href="#cb40-61" aria-hidden="true" tabindex="-1"></a>      <span class="at">hit_rate_t1        =</span> go_t1_n_go <span class="sc">/</span> go_t1_n,</span>
-<span id="cb40-62"><a href="#cb40-62" aria-hidden="true" tabindex="-1"></a>      <span class="at">falsealarm_rate_t1 =</span> nogo_t1_n_go <span class="sc">/</span> nogo_t1_n,</span>
-<span id="cb40-63"><a href="#cb40-63" aria-hidden="true" tabindex="-1"></a>      <span class="at">hit_rate_t2        =</span> go_t2_n_go <span class="sc">/</span> go_t2_n,</span>
-<span id="cb40-64"><a href="#cb40-64" aria-hidden="true" tabindex="-1"></a>      <span class="at">falsealarm_rate_t2 =</span> nogo_t2_n_go <span class="sc">/</span> nogo_t2_n,</span>
-<span id="cb40-65"><a href="#cb40-65" aria-hidden="true" tabindex="-1"></a>      <span class="at">d_prime_t1         =</span> <span class="fu">qnorm</span>(hit_rate_t1) <span class="sc">-</span> <span class="fu">qnorm</span>(falsealarm_rate_t1),</span>
-<span id="cb40-66"><a href="#cb40-66" aria-hidden="true" tabindex="-1"></a>      <span class="at">d_prime_t2         =</span> <span class="fu">qnorm</span>(hit_rate_t2) <span class="sc">-</span> <span class="fu">qnorm</span>(falsealarm_rate_t2)</span>
-<span id="cb40-67"><a href="#cb40-67" aria-hidden="true" tabindex="-1"></a>    )</span>
-<span id="cb40-68"><a href="#cb40-68" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb40-69"><a href="#cb40-69" aria-hidden="true" tabindex="-1"></a><span class="fu">data.frame</span>(data_long_odd<span class="sc">$</span>d_prime_t1, data_long_even<span class="sc">$</span>d_prime_t1) <span class="sc">%&gt;%</span></span>
-<span id="cb40-70"><a href="#cb40-70" aria-hidden="true" tabindex="-1"></a>  psych<span class="sc">::</span><span class="fu">alpha</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>
-Reliability analysis   
-Call: psych::alpha(x = .)
-
-  raw_alpha std.alpha G6(smc) average_r S/N   ase mean   sd median_r
-      0.94      0.94    0.89      0.89  17 0.011  3.3 0.71     0.89
-
-    95% confidence boundaries 
-         lower alpha upper
-Feldt     0.92  0.94  0.96
-Duhachek  0.92  0.94  0.97
-
- Reliability if an item is dropped:
-                          raw_alpha std.alpha G6(smc) average_r S/N alpha se
-data_long_odd.d_prime_t1       0.89      0.89     0.8      0.89 8.5       NA
-data_long_even.d_prime_t1      0.90      0.89     0.8      0.89 8.5       NA
-                          var.r med.r
-data_long_odd.d_prime_t1      0  0.89
-data_long_even.d_prime_t1     0  0.89
-
- Item statistics 
-                            n raw.r std.r r.cor r.drop mean   sd
-data_long_odd.d_prime_t1  107  0.97  0.97  0.92   0.89  3.3 0.72
-data_long_even.d_prime_t1 107  0.97  0.97  0.92   0.89  3.3 0.73</code></pre>
-</div>
-<div class="sourceCode cell-code" id="cb42"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb42-1"><a href="#cb42-1" aria-hidden="true" tabindex="-1"></a>split_half_cor_t1 <span class="ot">=</span> <span class="fu">cor</span>(data_long_odd<span class="sc">$</span>d_prime_t1, data_long_even<span class="sc">$</span>d_prime_t1)</span>
-<span id="cb42-2"><a href="#cb42-2" aria-hidden="true" tabindex="-1"></a>split_half_cor_t2 <span class="ot">=</span> <span class="fu">cor</span>(data_long_odd<span class="sc">$</span>d_prime_t2, data_long_even<span class="sc">$</span>d_prime_t2)</span>
-<span id="cb42-3"><a href="#cb42-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb42-4"><a href="#cb42-4" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"Split-Half Reliability at T1 (Spearman-Brown Formula):"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb37"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a>data_long_odd <span class="ot">=</span> data_long <span class="sc">%&gt;%</span></span>
+<span id="cb37-2"><a href="#cb37-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(trial <span class="sc">%%</span> <span class="dv">2</span> <span class="sc">==</span> <span class="dv">1</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb37-3"><a href="#cb37-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(pps, session, condition) <span class="sc">%&gt;%</span></span>
+<span id="cb37-4"><a href="#cb37-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">summarise</span>(</span>
+<span id="cb37-5"><a href="#cb37-5" aria-hidden="true" tabindex="-1"></a>      <span class="at">n         =</span> <span class="fu">n</span>(),</span>
+<span id="cb37-6"><a href="#cb37-6" aria-hidden="true" tabindex="-1"></a>      <span class="at">n_correct =</span> <span class="fu">sum</span>(correct)</span>
+<span id="cb37-7"><a href="#cb37-7" aria-hidden="true" tabindex="-1"></a>    ) <span class="sc">%&gt;%</span></span>
+<span id="cb37-8"><a href="#cb37-8" aria-hidden="true" tabindex="-1"></a>    <span class="fu">ungroup</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb37-9"><a href="#cb37-9" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(</span>
+<span id="cb37-10"><a href="#cb37-10" aria-hidden="true" tabindex="-1"></a>      <span class="at">n_go =</span> <span class="fu">ifelse</span>(condition <span class="sc">==</span> <span class="dv">0</span>, n_correct, n <span class="sc">-</span> n_correct)</span>
+<span id="cb37-11"><a href="#cb37-11" aria-hidden="true" tabindex="-1"></a>    ) <span class="sc">%&gt;%</span></span>
+<span id="cb37-12"><a href="#cb37-12" aria-hidden="true" tabindex="-1"></a>    <span class="fu">ungroup</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb37-13"><a href="#cb37-13" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(</span>
+<span id="cb37-14"><a href="#cb37-14" aria-hidden="true" tabindex="-1"></a>      <span class="at">n_go =</span> <span class="fu">ifelse</span>(n_go <span class="sc">==</span> n, n_go <span class="sc">-</span> <span class="dv">1</span>, n_go),</span>
+<span id="cb37-15"><a href="#cb37-15" aria-hidden="true" tabindex="-1"></a>      <span class="at">n_go =</span> <span class="fu">ifelse</span>(n_go <span class="sc">==</span><span class="dv">0</span>,                  <span class="dv">1</span>  , n_go)</span>
+<span id="cb37-16"><a href="#cb37-16" aria-hidden="true" tabindex="-1"></a>    ) <span class="sc">%&gt;%</span></span>
+<span id="cb37-17"><a href="#cb37-17" aria-hidden="true" tabindex="-1"></a>    <span class="fu">arrange</span>(pps) <span class="sc">%&gt;%</span></span>
+<span id="cb37-18"><a href="#cb37-18" aria-hidden="true" tabindex="-1"></a>    <span class="fu">ungroup</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb37-19"><a href="#cb37-19" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="at">condition =</span> <span class="fu">factor</span>(<span class="fu">ifelse</span>(condition <span class="sc">==</span> <span class="dv">0</span>, <span class="st">"go"</span>, <span class="st">"nogo"</span>))) <span class="sc">%&gt;%</span></span>
+<span id="cb37-20"><a href="#cb37-20" aria-hidden="true" tabindex="-1"></a>    <span class="fu">pivot_wider</span>(</span>
+<span id="cb37-21"><a href="#cb37-21" aria-hidden="true" tabindex="-1"></a>      <span class="at">id_cols =</span> pps,</span>
+<span id="cb37-22"><a href="#cb37-22" aria-hidden="true" tabindex="-1"></a>      <span class="at">names_from =</span> <span class="fu">c</span>(condition, session),</span>
+<span id="cb37-23"><a href="#cb37-23" aria-hidden="true" tabindex="-1"></a>      <span class="at">values_from =</span> <span class="fu">c</span>(n, n_go),</span>
+<span id="cb37-24"><a href="#cb37-24" aria-hidden="true" tabindex="-1"></a>      <span class="at">names_glue =</span> <span class="st">"{condition}_t{session}_{.value}"</span></span>
+<span id="cb37-25"><a href="#cb37-25" aria-hidden="true" tabindex="-1"></a>    ) <span class="sc">%&gt;%</span></span>
+<span id="cb37-26"><a href="#cb37-26" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(</span>
+<span id="cb37-27"><a href="#cb37-27" aria-hidden="true" tabindex="-1"></a>      <span class="at">hit_rate_t1        =</span> go_t1_n_go <span class="sc">/</span> go_t1_n,</span>
+<span id="cb37-28"><a href="#cb37-28" aria-hidden="true" tabindex="-1"></a>      <span class="at">falsealarm_rate_t1 =</span> nogo_t1_n_go <span class="sc">/</span> nogo_t1_n,</span>
+<span id="cb37-29"><a href="#cb37-29" aria-hidden="true" tabindex="-1"></a>      <span class="at">hit_rate_t2        =</span> go_t2_n_go <span class="sc">/</span> go_t2_n,</span>
+<span id="cb37-30"><a href="#cb37-30" aria-hidden="true" tabindex="-1"></a>      <span class="at">falsealarm_rate_t2 =</span> nogo_t2_n_go <span class="sc">/</span> nogo_t2_n,</span>
+<span id="cb37-31"><a href="#cb37-31" aria-hidden="true" tabindex="-1"></a>      <span class="at">d_prime_t1         =</span> <span class="fu">qnorm</span>(hit_rate_t1) <span class="sc">-</span> <span class="fu">qnorm</span>(falsealarm_rate_t1),</span>
+<span id="cb37-32"><a href="#cb37-32" aria-hidden="true" tabindex="-1"></a>      <span class="at">d_prime_t2         =</span> <span class="fu">qnorm</span>(hit_rate_t2) <span class="sc">-</span> <span class="fu">qnorm</span>(falsealarm_rate_t2)</span>
+<span id="cb37-33"><a href="#cb37-33" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb37-34"><a href="#cb37-34" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb37-35"><a href="#cb37-35" aria-hidden="true" tabindex="-1"></a>data_long_even <span class="ot">=</span> data_long <span class="sc">%&gt;%</span></span>
+<span id="cb37-36"><a href="#cb37-36" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(trial <span class="sc">%%</span> <span class="dv">2</span> <span class="sc">==</span> <span class="dv">0</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb37-37"><a href="#cb37-37" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(pps, session, condition) <span class="sc">%&gt;%</span></span>
+<span id="cb37-38"><a href="#cb37-38" aria-hidden="true" tabindex="-1"></a>    <span class="fu">summarise</span>(</span>
+<span id="cb37-39"><a href="#cb37-39" aria-hidden="true" tabindex="-1"></a>      <span class="at">n         =</span> <span class="fu">n</span>(),</span>
+<span id="cb37-40"><a href="#cb37-40" aria-hidden="true" tabindex="-1"></a>      <span class="at">n_correct =</span> <span class="fu">sum</span>(correct)</span>
+<span id="cb37-41"><a href="#cb37-41" aria-hidden="true" tabindex="-1"></a>    ) <span class="sc">%&gt;%</span></span>
+<span id="cb37-42"><a href="#cb37-42" aria-hidden="true" tabindex="-1"></a>    <span class="fu">ungroup</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb37-43"><a href="#cb37-43" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(</span>
+<span id="cb37-44"><a href="#cb37-44" aria-hidden="true" tabindex="-1"></a>      <span class="at">n_go =</span> <span class="fu">ifelse</span>(condition <span class="sc">==</span> <span class="dv">0</span>, n_correct, n <span class="sc">-</span> n_correct)</span>
+<span id="cb37-45"><a href="#cb37-45" aria-hidden="true" tabindex="-1"></a>    ) <span class="sc">%&gt;%</span></span>
+<span id="cb37-46"><a href="#cb37-46" aria-hidden="true" tabindex="-1"></a>    <span class="fu">ungroup</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb37-47"><a href="#cb37-47" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(</span>
+<span id="cb37-48"><a href="#cb37-48" aria-hidden="true" tabindex="-1"></a>      <span class="at">n_go =</span> <span class="fu">ifelse</span>(n_go <span class="sc">==</span> n, n_go <span class="sc">-</span> <span class="dv">1</span>, n_go),</span>
+<span id="cb37-49"><a href="#cb37-49" aria-hidden="true" tabindex="-1"></a>      <span class="at">n_go =</span> <span class="fu">ifelse</span>(n_go <span class="sc">==</span><span class="dv">0</span>,                  <span class="dv">1</span>  , n_go)</span>
+<span id="cb37-50"><a href="#cb37-50" aria-hidden="true" tabindex="-1"></a>    ) <span class="sc">%&gt;%</span></span>
+<span id="cb37-51"><a href="#cb37-51" aria-hidden="true" tabindex="-1"></a>    <span class="fu">arrange</span>(pps) <span class="sc">%&gt;%</span></span>
+<span id="cb37-52"><a href="#cb37-52" aria-hidden="true" tabindex="-1"></a>    <span class="fu">ungroup</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb37-53"><a href="#cb37-53" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="at">condition =</span> <span class="fu">factor</span>(<span class="fu">ifelse</span>(condition <span class="sc">==</span> <span class="dv">0</span>, <span class="st">"go"</span>, <span class="st">"nogo"</span>))) <span class="sc">%&gt;%</span></span>
+<span id="cb37-54"><a href="#cb37-54" aria-hidden="true" tabindex="-1"></a>    <span class="fu">pivot_wider</span>(</span>
+<span id="cb37-55"><a href="#cb37-55" aria-hidden="true" tabindex="-1"></a>      <span class="at">id_cols =</span> pps,</span>
+<span id="cb37-56"><a href="#cb37-56" aria-hidden="true" tabindex="-1"></a>      <span class="at">names_from =</span> <span class="fu">c</span>(condition, session),</span>
+<span id="cb37-57"><a href="#cb37-57" aria-hidden="true" tabindex="-1"></a>      <span class="at">values_from =</span> <span class="fu">c</span>(n, n_go),</span>
+<span id="cb37-58"><a href="#cb37-58" aria-hidden="true" tabindex="-1"></a>      <span class="at">names_glue =</span> <span class="st">"{condition}_t{session}_{.value}"</span></span>
+<span id="cb37-59"><a href="#cb37-59" aria-hidden="true" tabindex="-1"></a>    ) <span class="sc">%&gt;%</span></span>
+<span id="cb37-60"><a href="#cb37-60" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(</span>
+<span id="cb37-61"><a href="#cb37-61" aria-hidden="true" tabindex="-1"></a>      <span class="at">hit_rate_t1        =</span> go_t1_n_go <span class="sc">/</span> go_t1_n,</span>
+<span id="cb37-62"><a href="#cb37-62" aria-hidden="true" tabindex="-1"></a>      <span class="at">falsealarm_rate_t1 =</span> nogo_t1_n_go <span class="sc">/</span> nogo_t1_n,</span>
+<span id="cb37-63"><a href="#cb37-63" aria-hidden="true" tabindex="-1"></a>      <span class="at">hit_rate_t2        =</span> go_t2_n_go <span class="sc">/</span> go_t2_n,</span>
+<span id="cb37-64"><a href="#cb37-64" aria-hidden="true" tabindex="-1"></a>      <span class="at">falsealarm_rate_t2 =</span> nogo_t2_n_go <span class="sc">/</span> nogo_t2_n,</span>
+<span id="cb37-65"><a href="#cb37-65" aria-hidden="true" tabindex="-1"></a>      <span class="at">d_prime_t1         =</span> <span class="fu">qnorm</span>(hit_rate_t1) <span class="sc">-</span> <span class="fu">qnorm</span>(falsealarm_rate_t1),</span>
+<span id="cb37-66"><a href="#cb37-66" aria-hidden="true" tabindex="-1"></a>      <span class="at">d_prime_t2         =</span> <span class="fu">qnorm</span>(hit_rate_t2) <span class="sc">-</span> <span class="fu">qnorm</span>(falsealarm_rate_t2)</span>
+<span id="cb37-67"><a href="#cb37-67" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb37-68"><a href="#cb37-68" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb37-69"><a href="#cb37-69" aria-hidden="true" tabindex="-1"></a>split_half_cor_t1 <span class="ot">=</span> <span class="fu">cor</span>(data_long_odd<span class="sc">$</span>d_prime_t1, data_long_even<span class="sc">$</span>d_prime_t1)</span>
+<span id="cb37-70"><a href="#cb37-70" aria-hidden="true" tabindex="-1"></a>split_half_cor_t2 <span class="ot">=</span> <span class="fu">cor</span>(data_long_odd<span class="sc">$</span>d_prime_t2, data_long_even<span class="sc">$</span>d_prime_t2)</span>
+<span id="cb37-71"><a href="#cb37-71" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb37-72"><a href="#cb37-72" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"Split-Half Reliability at T1 (Spearman-Brown Formula):"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Split-Half Reliability at T1 (Spearman-Brown Formula):</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb44"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb44-1"><a href="#cb44-1" aria-hidden="true" tabindex="-1"></a>(<span class="dv">2</span><span class="sc">*</span>split_half_cor_t1)<span class="sc">/</span>(<span class="dv">1</span><span class="sc">+</span>split_half_cor_t1)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb39"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a>(<span class="dv">2</span><span class="sc">*</span>split_half_cor_t1)<span class="sc">/</span>(<span class="dv">1</span><span class="sc">+</span>split_half_cor_t1)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] 0.9442301</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb46"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb46-1"><a href="#cb46-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"Split-Half Reliability at T2 (Spearman-Brown Formula):"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb41"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb41-1"><a href="#cb41-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"Split-Half Reliability at T2 (Spearman-Brown Formula):"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Split-Half Reliability at T2 (Spearman-Brown Formula):</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb48"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb48-1"><a href="#cb48-1" aria-hidden="true" tabindex="-1"></a>(<span class="dv">2</span><span class="sc">*</span>split_half_cor_t2)<span class="sc">/</span>(<span class="dv">1</span><span class="sc">+</span>split_half_cor_t2)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb43"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb43-1"><a href="#cb43-1" aria-hidden="true" tabindex="-1"></a>(<span class="dv">2</span><span class="sc">*</span>split_half_cor_t2)<span class="sc">/</span>(<span class="dv">1</span><span class="sc">+</span>split_half_cor_t2)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] 0.956713</code></pre>
 </div>
