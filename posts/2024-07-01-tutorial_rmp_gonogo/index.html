@@ -229,8 +229,8 @@ window.Quarto = {
   <li><a href="#model-results" id="toc-model-results" class="nav-link" data-scroll-target="#model-results">Model results</a></li>
   </ul></li>
   </ul></li>
-  <li><a href="#calculate-relative-measurement-precision" id="toc-calculate-relative-measurement-precision" class="nav-link" data-scroll-target="#calculate-relative-measurement-precision">Calculate Relative Measurement Precision</a></li>
-  <li><a href="#plot-relative-measurement-precision-estimates" id="toc-plot-relative-measurement-precision-estimates" class="nav-link" data-scroll-target="#plot-relative-measurement-precision-estimates">Plot relative measurement precision estimates</a></li>
+  <li><a href="#calculate-reliability" id="toc-calculate-reliability" class="nav-link" data-scroll-target="#calculate-reliability">Calculate Reliability</a></li>
+  <li><a href="#plot-different-reliability-posterior-distributions" id="toc-plot-different-reliability-posterior-distributions" class="nav-link" data-scroll-target="#plot-different-reliability-posterior-distributions">Plot different reliability posterior distributions</a></li>
   <li><a href="#coda---are-bayesian-regression-estimates-of-d-more-reliable-measures-than-standard-estimates" id="toc-coda---are-bayesian-regression-estimates-of-d-more-reliable-measures-than-standard-estimates" class="nav-link" data-scroll-target="#coda---are-bayesian-regression-estimates-of-d-more-reliable-measures-than-standard-estimates">Coda - are Bayesian regression estimates of <code>d'</code> more reliable measures than standard estimates?</a></li>
   <li><a href="#split-half-approach" id="toc-split-half-approach" class="nav-link" data-scroll-target="#split-half-approach">Split-half approach</a></li>
   </ul>
@@ -245,8 +245,7 @@ window.Quarto = {
 
 <section id="introduction" class="level1">
 <h1>Introduction</h1>
-<p>This is a short walk-through of how to calculate relative measurement precision (RMP) internal consistency for <code>d'</code> for a go/no-go task.</p>
-<p>For more information about RMP, see our <a href="#0">pre-print</a> (ADD LINK).</p>
+<p>This is a short walk-through of how to calculate reliability using the algorithm described in our <a href="#0">pre-print</a> (ADD LINK), for <code>d'</code> for a go/no-go task.</p>
 <p>For a more detailed tutorial and background on signal detection theory models, I’d recommend the first few chapters of <a href="https://www.routledge.com/Detection-Theory-A-Users-Guide/Hautus-Macmillan-Creelman/p/book/9781138320857">Dection Theory: A User’s Guide</a> and <a href="https://mvuorre.github.io/posts/2017-10-09-bayesian-estimation-of-signal-detection-theory-models/">Matti Vourre’s Excellent Blog</a>, which will explain how these models work in more detail.</p>
 <section id="load-data-from-hedges-reliability-paradox-paper" class="level2">
 <h2 class="anchored" data-anchor-id="load-data-from-hedges-reliability-paradox-paper">Load Data from Hedge’s “Reliability Paradox” paper</h2>
@@ -314,23 +313,23 @@ window.Quarto = {
 <p>In this go/no-go task, one of four letters is shown on screen. Participants are told to press the space bar as quickly as possible to three of the four letters (the “go” condition trials) and to not press the space bar if one of the letters appears on screen (the “no-go” condition trials).</p>
 <div class="cell">
 <div class="cell-output-display">
-<div id="jewizkjwzu" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
-<style>#jewizkjwzu table {
+<div id="kijplwhvgs" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<style>#kijplwhvgs table {
   font-family: system-ui, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-#jewizkjwzu thead, #jewizkjwzu tbody, #jewizkjwzu tfoot, #jewizkjwzu tr, #jewizkjwzu td, #jewizkjwzu th {
+#kijplwhvgs thead, #kijplwhvgs tbody, #kijplwhvgs tfoot, #kijplwhvgs tr, #kijplwhvgs td, #kijplwhvgs th {
   border-style: none;
 }
 
-#jewizkjwzu p {
+#kijplwhvgs p {
   margin: 0;
   padding: 0;
 }
 
-#jewizkjwzu .gt_table {
+#kijplwhvgs .gt_table {
   display: table;
   border-collapse: collapse;
   line-height: normal;
@@ -356,12 +355,12 @@ window.Quarto = {
   border-left-color: #D3D3D3;
 }
 
-#jewizkjwzu .gt_caption {
+#kijplwhvgs .gt_caption {
   padding-top: 4px;
   padding-bottom: 4px;
 }
 
-#jewizkjwzu .gt_title {
+#kijplwhvgs .gt_title {
   color: #333333;
   font-size: 125%;
   font-weight: initial;
@@ -373,7 +372,7 @@ window.Quarto = {
   border-bottom-width: 0;
 }
 
-#jewizkjwzu .gt_subtitle {
+#kijplwhvgs .gt_subtitle {
   color: #333333;
   font-size: 85%;
   font-weight: initial;
@@ -385,7 +384,7 @@ window.Quarto = {
   border-top-width: 0;
 }
 
-#jewizkjwzu .gt_heading {
+#kijplwhvgs .gt_heading {
   background-color: #FFFFFF;
   text-align: center;
   border-bottom-color: #FFFFFF;
@@ -397,13 +396,13 @@ window.Quarto = {
   border-right-color: #D3D3D3;
 }
 
-#jewizkjwzu .gt_bottom_border {
+#kijplwhvgs .gt_bottom_border {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
 }
 
-#jewizkjwzu .gt_col_headings {
+#kijplwhvgs .gt_col_headings {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -418,7 +417,7 @@ window.Quarto = {
   border-right-color: #D3D3D3;
 }
 
-#jewizkjwzu .gt_col_heading {
+#kijplwhvgs .gt_col_heading {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -438,7 +437,7 @@ window.Quarto = {
   overflow-x: hidden;
 }
 
-#jewizkjwzu .gt_column_spanner_outer {
+#kijplwhvgs .gt_column_spanner_outer {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -450,15 +449,15 @@ window.Quarto = {
   padding-right: 4px;
 }
 
-#jewizkjwzu .gt_column_spanner_outer:first-child {
+#kijplwhvgs .gt_column_spanner_outer:first-child {
   padding-left: 0;
 }
 
-#jewizkjwzu .gt_column_spanner_outer:last-child {
+#kijplwhvgs .gt_column_spanner_outer:last-child {
   padding-right: 0;
 }
 
-#jewizkjwzu .gt_column_spanner {
+#kijplwhvgs .gt_column_spanner {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
@@ -470,11 +469,11 @@ window.Quarto = {
   width: 100%;
 }
 
-#jewizkjwzu .gt_spanner_row {
+#kijplwhvgs .gt_spanner_row {
   border-bottom-style: hidden;
 }
 
-#jewizkjwzu .gt_group_heading {
+#kijplwhvgs .gt_group_heading {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -500,7 +499,7 @@ window.Quarto = {
   text-align: left;
 }
 
-#jewizkjwzu .gt_empty_group_heading {
+#kijplwhvgs .gt_empty_group_heading {
   padding: 0.5px;
   color: #333333;
   background-color: #FFFFFF;
@@ -515,15 +514,15 @@ window.Quarto = {
   vertical-align: middle;
 }
 
-#jewizkjwzu .gt_from_md > :first-child {
+#kijplwhvgs .gt_from_md > :first-child {
   margin-top: 0;
 }
 
-#jewizkjwzu .gt_from_md > :last-child {
+#kijplwhvgs .gt_from_md > :last-child {
   margin-bottom: 0;
 }
 
-#jewizkjwzu .gt_row {
+#kijplwhvgs .gt_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -542,7 +541,7 @@ window.Quarto = {
   overflow-x: hidden;
 }
 
-#jewizkjwzu .gt_stub {
+#kijplwhvgs .gt_stub {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -555,7 +554,7 @@ window.Quarto = {
   padding-right: 5px;
 }
 
-#jewizkjwzu .gt_stub_row_group {
+#kijplwhvgs .gt_stub_row_group {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -569,15 +568,15 @@ window.Quarto = {
   vertical-align: top;
 }
 
-#jewizkjwzu .gt_row_group_first td {
+#kijplwhvgs .gt_row_group_first td {
   border-top-width: 2px;
 }
 
-#jewizkjwzu .gt_row_group_first th {
+#kijplwhvgs .gt_row_group_first th {
   border-top-width: 2px;
 }
 
-#jewizkjwzu .gt_summary_row {
+#kijplwhvgs .gt_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -587,16 +586,16 @@ window.Quarto = {
   padding-right: 5px;
 }
 
-#jewizkjwzu .gt_first_summary_row {
+#kijplwhvgs .gt_first_summary_row {
   border-top-style: solid;
   border-top-color: #D3D3D3;
 }
 
-#jewizkjwzu .gt_first_summary_row.thick {
+#kijplwhvgs .gt_first_summary_row.thick {
   border-top-width: 2px;
 }
 
-#jewizkjwzu .gt_last_summary_row {
+#kijplwhvgs .gt_last_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -606,7 +605,7 @@ window.Quarto = {
   border-bottom-color: #D3D3D3;
 }
 
-#jewizkjwzu .gt_grand_summary_row {
+#kijplwhvgs .gt_grand_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -616,7 +615,7 @@ window.Quarto = {
   padding-right: 5px;
 }
 
-#jewizkjwzu .gt_first_grand_summary_row {
+#kijplwhvgs .gt_first_grand_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -626,7 +625,7 @@ window.Quarto = {
   border-top-color: #D3D3D3;
 }
 
-#jewizkjwzu .gt_last_grand_summary_row_top {
+#kijplwhvgs .gt_last_grand_summary_row_top {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -636,11 +635,11 @@ window.Quarto = {
   border-bottom-color: #D3D3D3;
 }
 
-#jewizkjwzu .gt_striped {
+#kijplwhvgs .gt_striped {
   background-color: rgba(128, 128, 128, 0.05);
 }
 
-#jewizkjwzu .gt_table_body {
+#kijplwhvgs .gt_table_body {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -649,7 +648,7 @@ window.Quarto = {
   border-bottom-color: #D3D3D3;
 }
 
-#jewizkjwzu .gt_footnotes {
+#kijplwhvgs .gt_footnotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -663,7 +662,7 @@ window.Quarto = {
   border-right-color: #D3D3D3;
 }
 
-#jewizkjwzu .gt_footnote {
+#kijplwhvgs .gt_footnote {
   margin: 0px;
   font-size: 90%;
   padding-top: 4px;
@@ -672,7 +671,7 @@ window.Quarto = {
   padding-right: 5px;
 }
 
-#jewizkjwzu .gt_sourcenotes {
+#kijplwhvgs .gt_sourcenotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -686,7 +685,7 @@ window.Quarto = {
   border-right-color: #D3D3D3;
 }
 
-#jewizkjwzu .gt_sourcenote {
+#kijplwhvgs .gt_sourcenote {
   font-size: 90%;
   padding-top: 4px;
   padding-bottom: 4px;
@@ -694,63 +693,63 @@ window.Quarto = {
   padding-right: 5px;
 }
 
-#jewizkjwzu .gt_left {
+#kijplwhvgs .gt_left {
   text-align: left;
 }
 
-#jewizkjwzu .gt_center {
+#kijplwhvgs .gt_center {
   text-align: center;
 }
 
-#jewizkjwzu .gt_right {
+#kijplwhvgs .gt_right {
   text-align: right;
   font-variant-numeric: tabular-nums;
 }
 
-#jewizkjwzu .gt_font_normal {
+#kijplwhvgs .gt_font_normal {
   font-weight: normal;
 }
 
-#jewizkjwzu .gt_font_bold {
+#kijplwhvgs .gt_font_bold {
   font-weight: bold;
 }
 
-#jewizkjwzu .gt_font_italic {
+#kijplwhvgs .gt_font_italic {
   font-style: italic;
 }
 
-#jewizkjwzu .gt_super {
+#kijplwhvgs .gt_super {
   font-size: 65%;
 }
 
-#jewizkjwzu .gt_footnote_marks {
+#kijplwhvgs .gt_footnote_marks {
   font-size: 75%;
   vertical-align: 0.4em;
   position: initial;
 }
 
-#jewizkjwzu .gt_asterisk {
+#kijplwhvgs .gt_asterisk {
   font-size: 100%;
   vertical-align: 0;
 }
 
-#jewizkjwzu .gt_indent_1 {
+#kijplwhvgs .gt_indent_1 {
   text-indent: 5px;
 }
 
-#jewizkjwzu .gt_indent_2 {
+#kijplwhvgs .gt_indent_2 {
   text-indent: 10px;
 }
 
-#jewizkjwzu .gt_indent_3 {
+#kijplwhvgs .gt_indent_3 {
   text-indent: 15px;
 }
 
-#jewizkjwzu .gt_indent_4 {
+#kijplwhvgs .gt_indent_4 {
   text-indent: 20px;
 }
 
-#jewizkjwzu .gt_indent_5 {
+#kijplwhvgs .gt_indent_5 {
   text-indent: 25px;
 }
 </style>
@@ -785,13 +784,13 @@ window.Quarto = {
 </div>
 <p>We will analyse the go/no-go task using a signal detection theory model to derive a measure of performance called sensitivity or <code>d'</code>.</p>
 <p>We can derive d’ using a random intercept and slope binomial regression model.</p>
-<p>The number of “go” responses will be the outcome variable. Condition (go/no-go) will be our predictor. In the “go” condition, we expect the number of go responses to be higher than the “no-go” condition. The sensitivity or <code>d'</code> parameter measures how well participants shift their probability of responding “go” in the no-go and go conditions.</p>
-<p>We can calculate d’ directly using a participant’s hit rate (HR; proportion of Go responses in the Go condition) and false alarm rate (FAR; proportion of Go responses in the No-Go condition):</p>
+<p>The number of “go” responses, when the participant presses the space bar, will be the outcome variable. Condition (go/no-go) will be our predictor. The number of go responses should be higher in the go condition than the no-go condition. The sensitivity or <code>d'</code> parameter measures how well participants shift their probability of responding go in the no-go and go conditions.</p>
+<p>We can calculate d’ directly using a participant’s hit rate (HR; proportion of go responses in the go condition) and false alarm rate (FAR; proportion of go responses in the no-go condition):</p>
 <p><span class="math display">\[
 d' = \Phi^{-1}(HR) - \Phi^{-1}(FAR)
 \]</span></p>
 <p>Where <span class="math inline">\(\Phi^{-1}\)</span> represents the inverse cumulative distribution function of the standard normal distribution. It converts values between 0-1 to z-scores.</p>
-<p><strong>We can also model d’ using a random intercept and slope regression probit regression model.</strong> This approach will allow us to estimate uncertainty in each participant’s fitted d’ value, and calculate RMP internal consistency.</p>
+<p><strong>We can also model d’ using a random intercept and slope regression probit regression model.</strong> This approach will allow us to estimate uncertainty in each participant’s fitted d’ value, and calculate internal consistency.</p>
 <p>We will contrast code condition so that <code>condition_contrast = -1/2</code> when “no-go”, and <code>condition_contrast = +1/2</code> for “go” trials.</p>
 <p>The random intercept captures individual’s propensity to generally respond “go” regardless of condition.</p>
 <p>The random slope captures how well individuals’ shift their probability of responding “go” between conditions.</p>
@@ -916,8 +915,11 @@ d' = \Phi^{-1}(HR) - \Phi^{-1}(FAR)
 <span id="cb6-60"><a href="#cb6-60" aria-hidden="true" tabindex="-1"></a>subj_draws_time_2 <span class="ot">=</span> subj_draws_time_2 <span class="sc">+</span> cond_main_effect_2</span>
 <span id="cb6-61"><a href="#cb6-61" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb6-62"><a href="#cb6-62" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-63"><a href="#cb6-63" aria-hidden="true" tabindex="-1"></a>subj_est_time_1 <span class="ot">=</span> <span class="fu">apply</span>(subj_draws_time_1, <span class="dv">1</span>, mean)</span>
-<span id="cb6-64"><a href="#cb6-64" aria-hidden="true" tabindex="-1"></a>subj_est_time_2 <span class="ot">=</span> <span class="fu">apply</span>(subj_draws_time_2, <span class="dv">1</span>, mean)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb6-63"><a href="#cb6-63" aria-hidden="true" tabindex="-1"></a><span class="co"># Calculate point-estimate of d' for each participant (posterior means)</span></span>
+<span id="cb6-64"><a href="#cb6-64" aria-hidden="true" tabindex="-1"></a><span class="co"># Time / Session 1</span></span>
+<span id="cb6-65"><a href="#cb6-65" aria-hidden="true" tabindex="-1"></a>subj_est_time_1 <span class="ot">=</span> <span class="fu">apply</span>(subj_draws_time_1, <span class="dv">1</span>, mean)</span>
+<span id="cb6-66"><a href="#cb6-66" aria-hidden="true" tabindex="-1"></a><span class="co"># Time / Session 2</span></span>
+<span id="cb6-67"><a href="#cb6-67" aria-hidden="true" tabindex="-1"></a>subj_est_time_2 <span class="ot">=</span> <span class="fu">apply</span>(subj_draws_time_2, <span class="dv">1</span>, mean)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <section id="model-results" class="level3">
 <h3 class="anchored" data-anchor-id="model-results">Model results</h3>
@@ -936,16 +938,16 @@ Multilevel Hyperparameters:
                                   Estimate Est.Error l-95% CI u-95% CI Rhat
 sd(Intercept)                         0.25      0.02     0.22     0.30 1.00
 sd(condition_contrast)                0.79      0.06     0.68     0.92 1.00
-cor(Intercept,condition_contrast)     0.14      0.11    -0.07     0.35 1.00
+cor(Intercept,condition_contrast)     0.14      0.11    -0.07     0.34 1.00
                                   Bulk_ESS Tail_ESS
-sd(Intercept)                         2371     4908
-sd(condition_contrast)                1374     2706
-cor(Intercept,condition_contrast)      705     1863
+sd(Intercept)                         1921     4419
+sd(condition_contrast)                1680     3227
+cor(Intercept,condition_contrast)      832     1729
 
 Regression Coefficients:
                    Estimate Est.Error l-95% CI u-95% CI Rhat Bulk_ESS Tail_ESS
-Intercept              0.78      0.03     0.73     0.84 1.00     1699     3324
-condition_contrast     3.38      0.08     3.22     3.54 1.00      958     2056
+Intercept              0.78      0.03     0.72     0.83 1.00     1646     3525
+condition_contrast     3.37      0.08     3.21     3.53 1.00      900     1929
 
 Draws were sampled using sample(hmc). For each parameter, Bulk_ESS
 and Tail_ESS are effective sample size measures, and Rhat is the potential
@@ -965,16 +967,16 @@ Multilevel Hyperparameters:
                                   Estimate Est.Error l-95% CI u-95% CI Rhat
 sd(Intercept)                         0.26      0.02     0.22     0.31 1.00
 sd(condition_contrast)                1.00      0.07     0.87     1.16 1.00
-cor(Intercept,condition_contrast)     0.33      0.10     0.13     0.51 1.01
+cor(Intercept,condition_contrast)     0.33      0.10     0.13     0.51 1.00
                                   Bulk_ESS Tail_ESS
-sd(Intercept)                         1495     3328
-sd(condition_contrast)                1012     1946
-cor(Intercept,condition_contrast)      398     1026
+sd(Intercept)                         2993     3860
+sd(condition_contrast)                1890     3720
+cor(Intercept,condition_contrast)     1067     2087
 
 Regression Coefficients:
                    Estimate Est.Error l-95% CI u-95% CI Rhat Bulk_ESS Tail_ESS
-Intercept              0.78      0.03     0.73     0.84 1.00     1346     2937
-condition_contrast     3.13      0.10     2.94     3.33 1.01      495      916
+Intercept              0.78      0.03     0.73     0.84 1.00     2488     3883
+condition_contrast     3.13      0.10     2.94     3.33 1.00     1297     2460
 
 Draws were sampled using sample(hmc). For each parameter, Bulk_ESS
 and Tail_ESS are effective sample size measures, and Rhat is the potential
@@ -984,25 +986,25 @@ scale reduction factor on split chains (at convergence, Rhat = 1).</code></pre>
 <p>Let’s look at the the matrices <code>subj_draws_time_1</code> and <code>subj_draws_time_2</code> of our posterior draws in detail.</p>
 <p>Below we show data from 4 posterior draws from the first 10 participants.</p>
 <p>For each session we have a matrix of 107 rows (one row for each subject) and 10,000 columns, where each row has 10,000 posterior draws of a subject’s true d’ value.</p>
-<p>Since the random effects are centered, I have added the posterior distribution of the main effect of <code>condition_contrast</code> to the random effects to these posteriors back on the right scale.</p>
+<p>Since random effects are generally centered (i.e., have a mean of zero), I have added the posterior distribution of the main effect of <code>condition_contrast</code> to the random slopes posteriors. This gives us posterior distributions that have the correct scaling for d’.</p>
 <p>If we just want point estimates of d’ for each participants, we could just take the mean value of each row of this matrix (e.g., <code>apply(subj_draws_time_1, 1, mean)</code>)</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>subj_draws_time_1 <span class="sc">%&gt;%</span></span>
 <span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">data.frame</span>() <span class="sc">%&gt;%</span></span>
 <span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">slice</span>(<span class="dv">1</span><span class="sc">:</span><span class="dv">10</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="dv">1</span><span class="sc">:</span><span class="dv">5</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="dv">1</span><span class="sc">:</span><span class="dv">4</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>                                   X1       X2       X3       X4       X5
-r_pps[1,condition_contrast]  2.678295 3.191256 2.748715 3.679088 2.853240
-r_pps[2,condition_contrast]  3.320670 3.173432 3.452445 3.845853 3.431283
-r_pps[3,condition_contrast]  3.526739 3.329743 3.626290 3.881893 3.530939
-r_pps[4,condition_contrast]  4.759060 4.807680 5.021130 4.684030 5.113570
-r_pps[5,condition_contrast]  3.065203 2.989125 3.064199 3.350858 3.027026
-r_pps[7,condition_contrast]  3.337199 2.844011 3.514729 3.063312 3.324809
-r_pps[8,condition_contrast]  3.525429 4.106357 3.821453 3.917202 4.091214
-r_pps[9,condition_contrast]  3.459289 3.822319 3.504680 4.228473 3.675441
-r_pps[10,condition_contrast] 3.222277 3.397768 3.708416 3.159492 3.694361
-r_pps[11,condition_contrast] 4.674070 4.316090 4.579070 5.195560 4.069727</code></pre>
+<pre><code>                                   X1       X2       X3       X4
+r_pps[1,condition_contrast]  2.823441 3.216233 2.771982 3.341816
+r_pps[2,condition_contrast]  3.153959 3.241113 3.398040 3.629772
+r_pps[3,condition_contrast]  3.517315 3.358397 3.969124 3.628064
+r_pps[4,condition_contrast]  4.227915 4.853350 4.224822 5.221130
+r_pps[5,condition_contrast]  2.947752 2.828173 3.101626 3.144997
+r_pps[7,condition_contrast]  3.133684 2.974872 3.229739 3.200401
+r_pps[8,condition_contrast]  3.195134 3.686708 3.564308 3.972665
+r_pps[9,condition_contrast]  3.613103 3.369058 3.942390 3.634168
+r_pps[10,condition_contrast] 3.170447 3.288316 3.203448 3.492876
+r_pps[11,condition_contrast] 4.789330 4.277429 4.404580 4.513110</code></pre>
 </div>
 <div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="fu">nrow</span>(subj_draws_time_1)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
@@ -1054,9 +1056,9 @@ r_pps[11,condition_contrast] 4.674070 4.316090 4.579070 5.195560 4.069727</code>
 </section>
 </section>
 </section>
-<section id="calculate-relative-measurement-precision" class="level1">
-<h1>Calculate Relative Measurement Precision</h1>
-<p>Define the relative_measurement_precision function:</p>
+<section id="calculate-reliability" class="level1">
+<h1>Calculate Reliability</h1>
+<p>Our reliability algorithm:</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>relative_measurement_precision <span class="ot">=</span> <span class="cf">function</span>(</span>
 <span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>    input_draws,</span>
@@ -1082,10 +1084,7 @@ r_pps[11,condition_contrast] 4.674070 4.316090 4.579070 5.195560 4.069727</code>
 </div>
 <p>Calculate relative measurement precision at each time point:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="co"># debug(relative_measurement_precision)</span></span>
-<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a><span class="co"># undebug(relative_measurement_precision)</span></span>
-<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a>rmp_time1 <span class="ot">=</span> <span class="fu">relative_measurement_precision</span>(subj_draws_time_1)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a>rmp_time1 <span class="ot">=</span> <span class="fu">relative_measurement_precision</span>(subj_draws_time_1)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] "Number of subjects: 107"
 [1] "Number of posterior draws: 10000"</code></pre>
@@ -1097,23 +1096,18 @@ r_pps[11,condition_contrast] 4.674070 4.316090 4.579070 5.195560 4.069727</code>
 </div>
 <div class="sourceCode cell-code" id="cb25"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a>rmp_time1<span class="sc">$</span>hdci</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>          y    ymin      ymax .width .point .interval
-1 0.8934711 0.86158 0.9230055   0.95   mean      hdci</code></pre>
+<pre><code>          y     ymin      ymax .width .point .interval
+1 0.8937231 0.863525 0.9231702   0.95   mean      hdci</code></pre>
 </div>
 <div class="sourceCode cell-code" id="cb27"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a>rmp_time2<span class="sc">$</span>hdci</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>          y      ymin      ymax .width .point .interval
-1 0.9317492 0.9105242 0.9514779   0.95   mean      hdci</code></pre>
+1 0.9307084 0.9087029 0.9507524   0.95   mean      hdci</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb29"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a><span class="co"># hist(rmp_time1$rmp_posterior, breaks = 100)</span></span>
-<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a><span class="co"># hist(rmp_time2$rmp_posterior, breaks = 100)</span></span>
-<span id="cb29-3"><a href="#cb29-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb29-4"><a href="#cb29-4" aria-hidden="true" tabindex="-1"></a>predicted_test_retest <span class="ot">=</span> <span class="fu">sqrt</span>(rmp_time1<span class="sc">$</span>rmp_posterior<span class="sc">*</span>rmp_time2<span class="sc">$</span>rmp_posterior)</span>
-<span id="cb29-5"><a href="#cb29-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb29-6"><a href="#cb29-6" aria-hidden="true" tabindex="-1"></a><span class="co"># ggdist::mean_hdci(predicted_test_retest, .width = 0.95)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb29"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a>predicted_test_retest <span class="ot">=</span> <span class="fu">sqrt</span>(rmp_time1<span class="sc">$</span>rmp_posterior<span class="sc">*</span>rmp_time2<span class="sc">$</span>rmp_posterior)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<p>Relative measurement precision indicates that reliability at the first time point was 87% (95% Credible Interval = 83%-91%), and at the second time point reliability was 91% (95% CI[89%, 94%]).</p>
-<p>The test-retest reliability is a little lower than these estimates (r = .70), as we might expect:</p>
+<p>Relative measurement precision indicates that reliability at the first time point was 89% (95% Credible Interval = 86%-92%), and at the second time point reliability was 93% (95% CI[91%, 95%]).</p>
+<p>The test-retest reliability is a little lower than these estimates (r = 0.73), as we might expect:</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb30"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cor.test</span>(subj_est_time_1, subj_est_time_2)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
@@ -1124,13 +1118,13 @@ data:  subj_est_time_1 and subj_est_time_2
 t = 10.872, df = 105, p-value &lt; 2.2e-16
 alternative hypothesis: true correlation is not equal to 0
 95 percent confidence interval:
- 0.6240919 0.8061942
+ 0.6240688 0.8061810
 sample estimates:
-     cor 
-0.727723 </code></pre>
+      cor 
+0.7277053 </code></pre>
 </div>
 </div>
-<p>If there were no changes in individuals latent (true) <code>d'</code> values across the conditions, we would expect the test-rest reliability to correspond to the internal consistency measures. Because change in inevitable, the test-retest reliability should usually be a bit lower than internal consistency.</p>
+<p>If there were no changes in individuals latent (true) <code>d'</code> values across the conditions, the population test-rest reliability and internal consistency should be identical. Because some change is inevitable, test-retest reliability will usually be a bit lower than internal consistency.</p>
 <p>Below we compare our posterior distributions for test-retest reliability to the internal consistency estimates at each time point.</p>
 <p>First, we calculate a posterior distribution for the test-retest reliability:</p>
 <div class="cell">
@@ -1169,8 +1163,8 @@ sample estimates:
 <span id="cb32-33"><a href="#cb32-33" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
-<section id="plot-relative-measurement-precision-estimates" class="level1">
-<h1>Plot relative measurement precision estimates</h1>
+<section id="plot-different-reliability-posterior-distributions" class="level1">
+<h1>Plot different reliability posterior distributions</h1>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb33"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a><span class="fu">data.frame</span>(<span class="st">`</span><span class="at">Test-Retest Posterior</span><span class="st">`</span> <span class="ot">=</span> test_retest_cor_posterior<span class="sc">$</span>rescor__subjesttime2__subjesttime1, <span class="st">`</span><span class="at">Internal Consistency Time 1</span><span class="st">`</span> <span class="ot">=</span> rmp_time1<span class="sc">$</span>rmp_posterior,  <span class="st">`</span><span class="at">Internal Consistency Time 2</span><span class="st">`</span> <span class="ot">=</span> rmp_time2<span class="sc">$</span>rmp_posterior) <span class="sc">%&gt;%</span> </span>
 <span id="cb33-2"><a href="#cb33-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_longer</span>(<span class="at">cols =</span> <span class="fu">everything</span>()) <span class="sc">%&gt;%</span></span>
@@ -1193,7 +1187,7 @@ sample estimates:
 <section id="coda---are-bayesian-regression-estimates-of-d-more-reliable-measures-than-standard-estimates" class="level1">
 <h1>Coda - are Bayesian regression estimates of <code>d'</code> more reliable measures than standard estimates?</h1>
 <p>If we just calculate <code>d'</code> using the transformed hit rate and false alarm rate, using the formula above, does this give us estimates that are very different, or less reliable?</p>
-<p>The answer appears to be no, the estimates are very similar regardless of which approach we take:</p>
+<p>The answer in this case seems to be no, the estimates are very similar regardless of which approach we take:</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb34"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a>two_stage_estimate <span class="ot">=</span> </span>
 <span id="cb34-2"><a href="#cb34-2" aria-hidden="true" tabindex="-1"></a> data_long_summarised <span class="sc">%&gt;%</span></span>
@@ -1284,7 +1278,8 @@ sample estimates:
 </section>
 <section id="split-half-approach" class="level1">
 <h1>Split-half approach</h1>
-<p>Finally, I checked how similar RMP estimates are to the standard split-half reliability estimates.</p>
+<p>If we want to avoid fitting Bayesian models, another way of calculating internal consistency is to use split-half approaches.</p>
+<p>I checked how similar our Bayesian internal consistency estimates are to the standard split-half reliability estimates.</p>
 <p>To calculate split-half reliability, I created two datasets with odd and even trials respectively. I then calculated d’ using the transformed hit and false alarm rates, and calculated the correlation between split-half estimates at each time point. These correlations are then transformed using the <a href="#0">Spearman-Brown “prophecy” formula</a>.</p>
 <p>The results are quite similar, though the split-half estimates are slightly higher.</p>
 <div class="cell">
@@ -1357,21 +1352,18 @@ sample estimates:
 <span id="cb37-67"><a href="#cb37-67" aria-hidden="true" tabindex="-1"></a>    )</span>
 <span id="cb37-68"><a href="#cb37-68" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb37-69"><a href="#cb37-69" aria-hidden="true" tabindex="-1"></a>split_half_cor_t1 <span class="ot">=</span> <span class="fu">cor</span>(data_long_odd<span class="sc">$</span>d_prime_t1, data_long_even<span class="sc">$</span>d_prime_t1)</span>
-<span id="cb37-70"><a href="#cb37-70" aria-hidden="true" tabindex="-1"></a>split_half_cor_t2 <span class="ot">=</span> <span class="fu">cor</span>(data_long_odd<span class="sc">$</span>d_prime_t2, data_long_even<span class="sc">$</span>d_prime_t2)</span>
-<span id="cb37-71"><a href="#cb37-71" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb37-72"><a href="#cb37-72" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"Split-Half Reliability at T1 (Spearman-Brown Formula):"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>Split-Half Reliability at T1 (Spearman-Brown Formula):</code></pre>
+<span id="cb37-70"><a href="#cb37-70" aria-hidden="true" tabindex="-1"></a>split_half_cor_t2 <span class="ot">=</span> <span class="fu">cor</span>(data_long_odd<span class="sc">$</span>d_prime_t2, data_long_even<span class="sc">$</span>d_prime_t2)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<div class="sourceCode cell-code" id="cb39"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a>(<span class="dv">2</span><span class="sc">*</span>split_half_cor_t1)<span class="sc">/</span>(<span class="dv">1</span><span class="sc">+</span>split_half_cor_t1)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p><strong>Split-Half Reliability at T1 (Spearman-Brown Formula):</strong></p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb38"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a>(<span class="dv">2</span><span class="sc">*</span>split_half_cor_t1)<span class="sc">/</span>(<span class="dv">1</span><span class="sc">+</span>split_half_cor_t1)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] 0.9442301</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb41"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb41-1"><a href="#cb41-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"Split-Half Reliability at T2 (Spearman-Brown Formula):"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>Split-Half Reliability at T2 (Spearman-Brown Formula):</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb43"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb43-1"><a href="#cb43-1" aria-hidden="true" tabindex="-1"></a>(<span class="dv">2</span><span class="sc">*</span>split_half_cor_t2)<span class="sc">/</span>(<span class="dv">1</span><span class="sc">+</span>split_half_cor_t2)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p><strong>Split-Half Reliability at T2 (Spearman-Brown Formula):</strong></p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb40"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb40-1"><a href="#cb40-1" aria-hidden="true" tabindex="-1"></a>(<span class="dv">2</span><span class="sc">*</span>split_half_cor_t2)<span class="sc">/</span>(<span class="dv">1</span><span class="sc">+</span>split_half_cor_t2)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] 0.956713</code></pre>
 </div>
