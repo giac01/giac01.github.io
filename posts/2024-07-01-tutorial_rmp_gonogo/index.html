@@ -224,10 +224,10 @@ window.Quarto = {
   <li><a href="#load-data-from-hedges-reliability-paradox-paper" id="toc-load-data-from-hedges-reliability-paradox-paper" class="nav-link" data-scroll-target="#load-data-from-hedges-reliability-paradox-paper">Load Data from Hedge’s “Reliability Paradox” paper</a></li>
   <li><a href="#gono-go-modelling" id="toc-gono-go-modelling" class="nav-link" data-scroll-target="#gono-go-modelling">Go/no-go Modelling</a></li>
   <li><a href="#summarise-data" id="toc-summarise-data" class="nav-link" data-scroll-target="#summarise-data">Summarise data</a></li>
+  </ul></li>
   <li><a href="#fit-bayesian-signal-detection-theory-models" id="toc-fit-bayesian-signal-detection-theory-models" class="nav-link" data-scroll-target="#fit-bayesian-signal-detection-theory-models">Fit Bayesian signal detection theory models</a>
   <ul class="collapse">
   <li><a href="#model-results" id="toc-model-results" class="nav-link" data-scroll-target="#model-results">Model results</a></li>
-  </ul></li>
   </ul></li>
   <li><a href="#calculate-reliability" id="toc-calculate-reliability" class="nav-link" data-scroll-target="#calculate-reliability">Calculate Reliability</a></li>
   <li><a href="#plot-different-reliability-posterior-distributions" id="toc-plot-different-reliability-posterior-distributions" class="nav-link" data-scroll-target="#plot-different-reliability-posterior-distributions">Plot different reliability posterior distributions</a></li>
@@ -794,7 +794,7 @@ d' = \Phi^{-1}(HR) - \Phi^{-1}(FAR)
 <p>We will contrast code condition so that <code>condition_contrast = -1/2</code> when “no-go”, and <code>condition_contrast = +1/2</code> for “go” trials.</p>
 <p>The random intercept captures individual’s propensity to generally respond “go” regardless of condition.</p>
 <p>The random slope captures how well individuals’ shift their probability of responding “go” between conditions.</p>
-<p>The beta coefficient for condition_contrast will correspond the change in the of responding “go” between conditions.</p>
+<p>The beta coefficient for condition_contrast corresponds (not exactly) to the change in the probability of responding “go” between conditions.</p>
 </section>
 <section id="summarise-data" class="level2">
 <h2 class="anchored" data-anchor-id="summarise-data">Summarise data</h2>
@@ -847,11 +847,12 @@ d' = \Phi^{-1}(HR) - \Phi^{-1}(FAR)
 <p>For example, if we wanted to estimate out the probability of a flipped bent coin landing on heads, we just need to know the number of heads and number of throws, not the value of each individual coin toss.</p>
 <p>One could model individual trials to include trial-level predictors, such as reaction time.</p>
 </section>
-<section id="fit-bayesian-signal-detection-theory-models" class="level2">
-<h2 class="anchored" data-anchor-id="fit-bayesian-signal-detection-theory-models">Fit Bayesian signal detection theory models</h2>
+</section>
+<section id="fit-bayesian-signal-detection-theory-models" class="level1">
+<h1>Fit Bayesian signal detection theory models</h1>
 <p>In the next code chunk, we fit our models to each session (time point) and we extract the posterior draws of each subject’s d’ value at each time point into two matrices called <code>subj_draws_time_1</code> and <code>subj_draws_time_2</code>.</p>
 <p>I will stick with brms’s default, vague priors on the model parameters.</p>
-<p>For calculating test-retest reliability, it makes sense to fit models at each time point independently. We do not want data from the second time point will be informing our estimates of <code>d'</code> at the first time point.</p>
+<p>For calculating test-retest reliability, it makes sense to fit models at each time point independently. We do not want data from the second time point informing our estimates of <code>d'</code> from the first time point.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co"># https://osf.io/cwzds/</span></span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a></span>
@@ -921,8 +922,8 @@ d' = \Phi^{-1}(HR) - \Phi^{-1}(FAR)
 <span id="cb6-66"><a href="#cb6-66" aria-hidden="true" tabindex="-1"></a><span class="co"># Time / Session 2</span></span>
 <span id="cb6-67"><a href="#cb6-67" aria-hidden="true" tabindex="-1"></a>subj_est_time_2 <span class="ot">=</span> <span class="fu">apply</span>(subj_draws_time_2, <span class="dv">1</span>, mean)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<section id="model-results" class="level3">
-<h3 class="anchored" data-anchor-id="model-results">Model results</h3>
+<section id="model-results" class="level2">
+<h2 class="anchored" data-anchor-id="model-results">Model results</h2>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>model_time_1</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
@@ -986,8 +987,8 @@ scale reduction factor on split chains (at convergence, Rhat = 1).</code></pre>
 <p>Let’s look at the the matrices <code>subj_draws_time_1</code> and <code>subj_draws_time_2</code> of our posterior draws in detail.</p>
 <p>Below we show data from 4 posterior draws from the first 10 participants.</p>
 <p>For each session we have a matrix of 107 rows (one row for each subject) and 10,000 columns, where each row has 10,000 posterior draws of a subject’s true d’ value.</p>
-<p>Since random effects are generally centered (i.e., have a mean of zero), I have added the posterior distribution of the main effect of <code>condition_contrast</code> to the random slopes posteriors. This gives us posterior distributions that have the correct scaling for d’.</p>
-<p>If we just want point estimates of d’ for each participants, we could just take the mean value of each row of this matrix (e.g., <code>apply(subj_draws_time_1, 1, mean)</code>)</p>
+<p>Since random effects are generally centered (i.e., have a mean of zero), I have added the posterior distribution of the main effect of <code>condition_contrast</code> to the random slope posteriors. This gives us posterior distributions that have the correct scaling for d’.</p>
+<p>If we just want point estimates of d’ for each participant, we could take the mean value of each row of this matrix (e.g., <code>apply(subj_draws_time_1, 1, mean)</code>)</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>subj_draws_time_1 <span class="sc">%&gt;%</span></span>
 <span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">data.frame</span>() <span class="sc">%&gt;%</span></span>
@@ -1021,8 +1022,8 @@ r_pps[11,condition_contrast] 4.789330 4.277429 4.404580 4.513110</code></pre>
 <span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">data.frame</span>() <span class="sc">%&gt;%</span></span>
 <span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rowid_to_column</span>(<span class="at">var =</span> <span class="st">"pps"</span>) <span class="sc">%&gt;%</span></span>
 <span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_longer</span>(<span class="at">cols =</span> <span class="sc">!</span><span class="fu">matches</span>(<span class="st">"pps"</span>)) <span class="sc">%&gt;%</span></span>
-<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> value, <span class="at">group =</span> pps, <span class="at">fill =</span> pps)) <span class="sc">+</span></span>
-<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_density</span>(<span class="at">alpha =</span> .<span class="dv">2</span>) <span class="sc">+</span></span>
+<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> value, <span class="at">group =</span> pps)) <span class="sc">+</span></span>
+<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_density</span>(<span class="at">alpha =</span> .<span class="dv">2</span>, <span class="at">fill =</span> <span class="st">"light blue"</span>) <span class="sc">+</span></span>
 <span id="cb17-7"><a href="#cb17-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Session 1: Posterior Distribution for each subject's Go/No-Go D' (sesnisitivity)"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <div>
@@ -1035,8 +1036,8 @@ r_pps[11,condition_contrast] 4.789330 4.277429 4.404580 4.513110</code></pre>
 <span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">data.frame</span>() <span class="sc">%&gt;%</span></span>
 <span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rowid_to_column</span>(<span class="at">var =</span> <span class="st">"pps"</span>) <span class="sc">%&gt;%</span></span>
 <span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_longer</span>(<span class="at">cols =</span> <span class="sc">!</span><span class="fu">matches</span>(<span class="st">"pps"</span>)) <span class="sc">%&gt;%</span></span>
-<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> value, <span class="at">group =</span> pps, <span class="at">fill =</span> pps)) <span class="sc">+</span></span>
-<span id="cb18-6"><a href="#cb18-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_density</span>(<span class="at">alpha =</span> .<span class="dv">2</span>) <span class="sc">+</span></span>
+<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> value, <span class="at">group =</span> pps)) <span class="sc">+</span></span>
+<span id="cb18-6"><a href="#cb18-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_density</span>(<span class="at">alpha =</span> .<span class="dv">2</span>, <span class="at">fill =</span> <span class="st">"light blue"</span>) <span class="sc">+</span></span>
 <span id="cb18-7"><a href="#cb18-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Session 2: Posterior Distribution for each subject's Go/No-Go D' (sesnisitivity)"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <div>
@@ -1051,9 +1052,8 @@ r_pps[11,condition_contrast] 4.789330 4.277429 4.404580 4.513110</code></pre>
 <span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a><span class="co">#   geom_density(alpha = .2) +</span></span>
 <span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a><span class="co">#   facet_wrap(~pps)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<p>Just from eye-balling the posteriors, we can see that there is a lot of variability between participants, and our estimates look quite precise.</p>
+<p>From eye-balling the posteriors, it is evidence that there is a lot of variability between participants, and our estimates look quite precise.</p>
 <p>As expected, most of the mass of each density lies above 0. If d’ is less than zero it would indicate that a participant is more likely to press the space bar (i.e., “go”) for no-go conditions than go conditions, which would be odd.</p>
-</section>
 </section>
 </section>
 <section id="calculate-reliability" class="level1">
@@ -1063,7 +1063,7 @@ r_pps[11,condition_contrast] 4.789330 4.277429 4.404580 4.513110</code></pre>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>devtools<span class="sc">::</span><span class="fu">install_github</span>(<span class="st">"giac01/gbtoolbox"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<p>Calculate relative measurement precision at each time point:</p>
+<p>Calculate internal consistency at each time point:</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a>internalconsistency_time1 <span class="ot">=</span> gbtoolbox<span class="sc">::</span><span class="fu">reliability</span>(subj_draws_time_1)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
@@ -1087,7 +1087,7 @@ r_pps[11,condition_contrast] 4.789330 4.277429 4.404580 4.513110</code></pre>
 </div>
 <div class="sourceCode cell-code" id="cb29"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a>predicted_test_retest <span class="ot">=</span> <span class="fu">sqrt</span>(internalconsistency_time1<span class="sc">$</span>reliability_posterior<span class="sc">*</span>internalconsistency_time2<span class="sc">$</span>reliability_posterior)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<p>Relative measurement precision indicates that reliability at the first time point was 89% (95% Credible Interval = 86%-92%), and at the second time point reliability was 93% (95% CI[91%, 95%]).</p>
+<p>The analyses indicate that reliability at the first time point was 89% (95% Credible Interval = 86%-92%), and at the second time point reliability was 93% (95% CI[91%, 95%]).</p>
 <p>The test-retest reliability is a little lower than these estimates (r = 0.73), as we might expect:</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb30"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cor.test</span>(subj_est_time_1, subj_est_time_2)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
