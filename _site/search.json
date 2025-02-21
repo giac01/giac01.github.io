@@ -1,17 +1,10 @@
 [
   {
-    "objectID": "posts.html",
-    "href": "posts.html",
-    "title": "Blog Posts",
-    "section": "",
-    "text": "No matching items"
-  },
-  {
     "objectID": "cv.html",
     "href": "cv.html",
     "title": "CV",
     "section": "",
-    "text": "Previous Employment\n\n2023+ Postdoctoral By-Fellow\n\nChurchill College, Cambridge\n\n2022+: Postdoctoral Research Associate\n\nDepartment of Psychology, University of Cambridge\nProfessor Sarah-Jayne Blakemore / Developmental Cognitive Neuroscience Lab\n\n2017-2021: PhD Studentship\n\nFunded PhD Scholarship with Professor Duncan Astle / 4D Lab\nResearch on developmental cognitive neuroscience\n\n2015-2017\n\nResearch Assistant, Institute of Public Health, University of Cambridge\nProfessor Theresa Marteau / The Behaviour and Health Research Unit (BHRU)\n\n\n\n\nEducation\n\nPhD, MRC Cognition and Brain Sciences Unit, University of Cambridge, 2021\nMRes in Animal Behaviour, Newcastle University (UK), 2015\nMA in Politics, Psychology & Sociology, University of Cambridge, 2014\nMathematical Statistics (M347 - 30 credit module), Open University, 2020."
+    "text": "Previous Employment\n\n2025+ Postdoctoral Research Associate\n\nINHERIT Lab, Social, Genetic & Developmental Psychiatry Centre, King’s College London\n\n2023-2025 Postdoctoral By-Fellow\n\nChurchill College, Cambridge\n\n2022-2025: Postdoctoral Research Associate\n\nDepartment of Psychology, University of Cambridge\nDevelopmental Cognitive Neuroscience Lab\n\n2017-2021: PhD Studentship\n\nFunded PhD Scholarship with 4D Lab\n\n2015-2017\n\nResearch Assistant, Institute of Public Health, University of Cambridge\nThe Behaviour and Health Research Unit (BHRU)\n\n\n\n\nEducation\n\nPhD, MRC Cognition and Brain Sciences Unit, University of Cambridge, 2021\nMRes in Animal Behaviour, Newcastle University (UK), 2015\nMA in Politics, Psychology & Sociology, University of Cambridge, 2014\nMathematical Statistics (M347 - 30 credit module), Open University, 2020."
   },
   {
     "objectID": "about.html",
@@ -25,6 +18,13 @@
     "href": "index.html",
     "title": "Giacomo Bignardi, PhD",
     "section": "",
-    "text": "Cambridge, United Kingdom  Department of Psychology, University of Cambridge  Postdoctoral By-Fellow, Churchill College, Cambridge\nGiacomo (pronounced jack-a-mo) is a postdoc at the University of Cambridge, based in the the Developmental Cognitive Neuroscience Group.\nI research the socioeconomic and environmental predictors of wellbeing in childhood & adolescence, using advanced quantitative methods and large-scale secondary datasets. I am also interested in quantitative research methods, particularly multivariate and Bayesian statistical methods, and how they can be applied to improve how we measure psychological constructs."
+    "text": "Cambridge, United Kingdom  Social, Genetic & Developmental Psychiatry Centre \nGiacomo (pronounced jack-a-mo) is a Postdoctoral Research Associate at Kings College London, based in the INHERIT group at the Social, Genetic & Developmental Psychiatry Centre.\nI research the socioeconomic and environmental predictors of wellbeing in childhood & adolescence, using advanced quantitative methods and large-scale secondary datasets. I am also interested in quantitative research methods, particularly multivariate and Bayesian statistical methods, and how they can be applied to improve how we measure psychological constructs."
+  },
+  {
+    "objectID": "posts.html",
+    "href": "posts.html",
+    "title": "Blog Posts",
+    "section": "",
+    "text": "No matching items"
   }
 ]
