@@ -3,7 +3,7 @@ title: "Issues with controlling for 'IQ'"
 description: "And why controlling for things is harder than you might think."
 author: "Giacomo Bignardi"
 date: "6/16/2024"
-draft: true
+draft: false
 execute: 
   warning: false
   message: false
