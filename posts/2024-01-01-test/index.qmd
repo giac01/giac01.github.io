@@ -12,7 +12,7 @@ A correlation matrix is the backbone of a lot of statistical methods. Therefore,
 
 Even though there are a few great R packages for creating correlation matrix plots, creating them directly in ggplot2 allows a lot more flexibility.
 
-A nice property of Pearson's correlation coefficient is that you all only need two pieces of informatjion
+A nice property of Pearson's correlation coefficient is that you all only need two pieces of information
 
 ```{r}
 
