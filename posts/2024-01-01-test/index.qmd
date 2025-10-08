@@ -25,7 +25,7 @@ df = mtcars
 cor(mtcars)
 ```
 
-##  Standard approach
+## Standard approach
 
 ```{r}
 corrplot::corrplot(cor(df), addCoef.col = 'black')

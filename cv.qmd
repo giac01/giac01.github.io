@@ -6,7 +6,7 @@ toc: false
 # Previous Employment
 
 -   2025+ Postdoctoral Research Associate
-    -   INHERIT Lab, Social, Genetic & Developmental Psychiatry Centre, King's College London
+    -   [INHERIT Lab, Social, Genetic & Developmental Psychiatry Centre, King's College London](https://www.kcl.ac.uk/research/inherit-lab)
 -   2023-2025 Postdoctoral By-Fellow
     -   [Churchill College, Cambridge](https://www.chu.cam.ac.uk/fellows/dr-giacomo-bignardi/)
 -   2022-2025: Postdoctoral Research Associate
